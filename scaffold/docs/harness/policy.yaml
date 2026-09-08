@@ -1,0 +1,13 @@
+# Agent / shell 硬拦策略（hooks 读取）
+
+project_name: "{{PROJECT_NAME}}"
+
+# 禁止写入的 glob（相对仓库根；也匹配 basename）
+forbidden_write_globs:
+  - ".env"
+  - ".env.*"
+  - "deploy/secrets/**"
+
+# 整棵子树只读（例如第三方参考仓、生成物）
+# 示例: ["vendor-ref", "third_party/foo"]
+readonly_path_prefixes: []

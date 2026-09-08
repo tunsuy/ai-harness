@@ -1,0 +1,16 @@
+# 知识库 SSOT（域注册表）
+#
+# 约定优于配置：禁止把每个源文件抄进本表。
+# 默认 conventions.mode = metadata_only（只强制 exemplar + 域表同步）。
+# 需要路径级归属时，在项目里扩展 scripts/kb_sync.py，或参考 ai-harness/examples/。
+version: 1
+
+conventions:
+  mode: metadata_only
+
+domains:
+  example:
+    summary: 示例域——请改成真实业务域并删除本条
+    writer: app
+    tables: []
+    exemplar: docs/playbooks/example-add-feature.md

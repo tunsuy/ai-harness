@@ -1,0 +1,23 @@
+---
+description: Harness 开场/硬拦/WIP
+alwaysApply: true
+---
+
+# 开场
+
+1. 读 `docs/harness/handoff.md`；`make handoff`；看最近 `wip:`。
+2. active/blocked → `make context-pack TASK=<task> DOMAIN=<domain>`，从 Next 续。
+3. idle → 开 `ai/*`|`feat/*` → 写 handoff → context-pack。
+4. 禁先全库盲目探索。
+
+# 进行中
+
+- 完成可验证步骤或换会话前：更新 handoff + `make wip-save MSG="…"`。
+- lint 绿 ≠ 完成；链路改动要跑项目 smoke。
+- 踩坑 → `docs/playbooks/harness-feedback.md`（加 check/hook，禁止只口头提醒）。
+
+# 硬拦（hooks）
+
+- Cursor / Claude / Codex / Antigravity（`.agents/hooks.json`）共用 `.cursor/hooks/deny-*.py`
+- 禁写路径见 `docs/harness/policy.yaml`；禁 force-push / 直推 main / 危险 rm / curl|sh
+- 入口：`AGENTS.md`；硬约定：`docs/harness/invariants.md`

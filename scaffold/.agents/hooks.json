@@ -1,0 +1,43 @@
+{
+  "harness-shell-policy": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .agents/hooks/run-policy.sh deny-dangerous-shell.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
+  "harness-path-policy": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .agents/hooks/run-policy.sh deny-forbidden-paths.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
+  "harness-session-bootstrap": {
+    "PreInvocation": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .agents/hooks/run-policy.sh session-start.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

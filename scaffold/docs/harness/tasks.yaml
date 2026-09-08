@@ -1,0 +1,45 @@
+# 任务路由表 —— 冷启动只读清单（禁止先全库探索）
+version: 1
+
+tasks:
+  resume:
+    summary: 跨会话续作（先读 handoff）
+    playbook: docs/playbooks/continue-handoff.md
+    must_read:
+      - docs/harness/handoff.md
+      - docs/playbooks/continue-handoff.md
+      - docs/harness/tasks.yaml
+      - docs/harness/domains.yaml
+
+  maintain-knowledge:
+    summary: 知识库/注册表维护
+    playbook: docs/playbooks/maintain-knowledge.md
+    must_read:
+      - docs/playbooks/maintain-knowledge.md
+      - docs/harness/domains.yaml
+      - docs/harness/tasks.yaml
+      - AGENTS.md
+
+  harness-feedback:
+    summary: agent 踩坑后加固 harness
+    playbook: docs/playbooks/harness-feedback.md
+    must_read:
+      - docs/playbooks/harness-feedback.md
+      - docs/harness/invariants.md
+      - AGENTS.md
+
+  example-add-feature:
+    summary: 示例业务任务（请改成真实任务）
+    playbook: docs/playbooks/example-add-feature.md
+    require_domain: true
+    must_read:
+      - docs/harness/domains.yaml
+      - docs/architecture.md
+      - docs/playbooks/example-add-feature.md
+
+  l1-micro:
+    summary: 单点微改（已知道文件）
+    playbook: ""
+    require_domain: true
+    must_read:
+      - docs/harness/domains.yaml
