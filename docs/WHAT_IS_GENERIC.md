@@ -21,7 +21,7 @@
 | 业务 playbook | HOW 绑定样板文件 |
 | 语言/栈门禁 | golangci、depguard、DDL 检查 |
 | 行为 smoke / `ci-smoke` | 断言产品链路，不是 harness 本身 |
-| `policy.yaml` 里的只读树 | 如某仓的 `vendor/`、`sub2api/` |
+| `policy.yaml` 里的只读树 | 如某仓的 `vendor/`、生成物目录 |
 
 ## 约定
 
