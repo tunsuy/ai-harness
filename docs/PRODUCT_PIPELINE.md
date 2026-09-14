@@ -11,13 +11,14 @@
 ```
 Define ──► Design ──► Build ──► Accept ──► Learn
   ↑人闸1     ↑人闸2              ↑人闸3
+             （含 UI 原型确认，若适用）
 ```
 
 | 阶段 | 角色（agent） | 产出物 | 禁止 |
 |------|---------------|--------|------|
 | **Define** | Product Brief | `docs/features/<id>/brief.md`（PRFAQ-lite） | 写业务代码、定技术栈 |
-| **Design** | Spec / Architect | ADR stub（若难逆转）+ `task_id` + 实现 playbook 骨架 | 实现；Brief 未过闸不动 |
-| **Build** | Builder（现有 harness） | 按 playbook 实现 + check/smoke | 改 Brief/验收标准 |
+| **Design** | Spec / Architect + **UI Prototype**（若有界面） | ADR stub（若难逆转）+ `task_id` + playbook 骨架；有 UI 时还有 `prototype.md` + 可访问预览链接 | 实现；Brief 未过闸不动；**原型未确认不得改业务代码** |
+| **Build** | Builder（现有 harness） | 按 playbook 实现 + check/smoke | 改 Brief/验收标准；改已确认的原型方向（须回 Design） |
 | **Accept** | Acceptance | `docs/features/<id>/accept.md` verdict | 「顺手修」；FAIL 必须打回 Build |
 | **Learn** | 任意 → harness-feedback | 更新 accept checklist / invariants / playbook | 只在聊天说「下次注意」 |
 
@@ -25,9 +26,27 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 
 1. **概念**：值不值得做（对照产品定位 / roadmap）
 2. **Brief**：范围、非目标、验收标准是否可测
-3. **Ship**：Accept = PASS 且风险分层要求的人工勾选完成
+3. **UI 原型**（有新页/新布局时）：预览链接确认后再进 Build
+4. **Ship**：Accept = PASS 且风险分层要求的人工勾选完成
 
-中间劳动（调研稿、ADR 草稿、编码、跑测）交给 agent。
+中间劳动（调研稿、ADR 草稿、原型 HTML、编码、跑测）交给 agent。
+
+## UI Prototype Gate（方案 A：静态原型，不依赖 OpenDesign）
+
+> 适用：新页面、改布局/信息架构、明显视觉方向选择。  
+> 豁免：纯文案/色值微调、已知组件内单点改（可标 `prototype_exempt`）；碰钱/租户/鉴权的逻辑仍走 Brief+Accept，与原型闸独立。
+
+**默认路径（云端 agent / 微信协作）：**
+
+1. Brief = `approved` 后进入 Design。
+2. Agent 只写 `docs/features/<id>/prototype/` 下的**自包含静态 HTML**（可多变体 `v1/` `v2/`），**不改** `apps/` / `packages/` / `services/` 等实现树。
+3. 发布可点开的 HTTPS（或内网）预览链接；更新 `docs/features/<id>/prototype.md`（状态 `pending`）。
+4. 人确认变体（微信口令：`确认 A` / `确认 B` / `改：…` / `重出`）→ `prototype.md` 标 `confirmed` + 选中变体。
+5. 再进 Build：按项目 UI 规范与 tokens **重做进生产组件**；静态原型不是生产源。
+
+模板：`scaffold/docs/features/_TEMPLATE/prototype.md`（项目可镜像到 `docs/features/_TEMPLATE/`）。
+
+OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**。
 
 ## Feature Brief（PRFAQ-lite）
 
@@ -59,6 +78,7 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 - [ ] AC 可测、无歧义，覆盖主路径 + 至少一条异常
 - [ ] 非目标已写
 - [ ] 若难逆转 / 跨服务 / 碰钱或租户 → ADR `已接受`
+- [ ] 有 UI 且未 `prototype_exempt` → `prototype.md` 状态 `confirmed`（含预览链接与选中变体）
 - [ ] `tasks.yaml` 有实现 `task_id` + playbook 骨架
 - [ ] roadmap（若有）已挂 `task_id`
 
@@ -77,7 +97,8 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 |------|--------|----------|
 | **Brief** | 新 feature / 大改范围 | 只写 `docs/features/**`；可读定位/roadmap/ADR |
 | **Architect** | DoR 中需 ADR 或跨域方案 | 写 ADR / task / playbook；不写业务实现 |
-| **Builder** | Brief=`approved` 且 DoR 齐 | 现有 playbook；不改 AC |
+| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；等人确认 |
+| **Builder** | Brief=`approved`、原型已确认（或豁免）、且 DoR 齐 | 现有 playbook；不改 AC；按确认变体落地 |
 | **Accept** | Build 自检完成 | 只读 + 跑验证；写 `accept.md`；不改产品代码 |
 
 独立会话优于同一会话「扮演多个角色」。Accept 不得与 Builder 共用未清上下文的长会话。
@@ -89,7 +110,7 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 | 产品流水线 SSOT | 本文件（引擎说明）+ 项目 `docs/product-pipeline.md` 附录 |
 | Feature 工件 | `docs/features/<id>/` |
 | HOW | `define-feature` / `accept-feature` + 业务 playbook |
-| 进度 | `handoff.md`（`phase: define\|design\|build\|accept` + `feature:`） |
+| 进度 | `handoff.md`（`phase: define\|design\|build\|accept` + `feature:`；有 UI 时加 `prototype_status: pending\|confirmed\|exempt`） |
 | **机械门禁** | `kb_sync.py check`（Brief 抢跑）/ `check-ship`（Accept PASS；`pr-merge` 调用） |
 | 踩坑回流 | `harness-feedback` + features/_checklist 滚动项 |
 

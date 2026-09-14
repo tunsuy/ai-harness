@@ -54,9 +54,11 @@
 |----|------|----|------|
 | 概念 | fund / kill / revise | | |
 | Brief | approved / revise | | |
+| UI 原型 | confirmed / exempt / n/a | | |
 
 ## 下游链接（DoR 后填写）
 
+- UI 原型：`prototype.md`（方案 A；有界面时）
 - ADR：
 - 实现 `task_id`：
 - Accept 报告：`accept.md`
