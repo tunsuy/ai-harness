@@ -9,6 +9,8 @@
 | 会话交接 + git WIP | `handoff.md` + `handoff.sh` + `wip-save.sh` |
 | Agent 硬拦适配 | `policy_lib` + Cursor/Claude/Codex/Antigravity hooks |
 | 失败回流 | playbook `harness-feedback.md` |
+| 产品流水线（定义/验收） | `docs/PRODUCT_PIPELINE.md` + scaffold `define-feature` / `accept-feature` + `docs/features/_TEMPLATE/` |
+| 产品机械门禁 | scaffold `kb_sync.py`：`check`（Brief 抢跑）/ `check-ship`（Accept PASS） |
 | 可配置禁写 | `docs/harness/policy.yaml` |
 | Make 目标 | `Makefile.harness.mk` |
 
@@ -19,6 +21,8 @@
 | `invariants.md` 业务硬约定 | 金额、密钥、拓扑因产品而异 |
 | `domains.yaml` 真实域 | 归属与表是产品知识 |
 | 业务 playbook | HOW 绑定样板文件 |
+| `docs/product-pipeline.md` 附录 | 风险分层 S 的业务定义、准出命令 |
+| `docs/features/<id>/` | 具体 Brief / Accept 工件 |
 | 语言/栈门禁 | golangci、depguard、DDL 检查 |
 | 行为 smoke / `ci-smoke` | 断言产品链路，不是 harness 本身 |
 | `policy.yaml` 里的只读树 | 如某仓的 `vendor/`、生成物目录 |

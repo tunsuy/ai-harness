@@ -28,6 +28,24 @@ tasks:
       - docs/harness/invariants.md
       - AGENTS.md
 
+  define-feature:
+    summary: 写 Feature Brief（Define；不写业务代码）
+    playbook: docs/playbooks/define-feature.md
+    must_read:
+      - docs/playbooks/define-feature.md
+      - docs/features/_TEMPLATE/brief.md
+      - docs/harness/invariants.md
+      - AGENTS.md
+
+  accept-feature:
+    summary: 对照 Brief AC 验收（Accept；不改产品代码）
+    playbook: docs/playbooks/accept-feature.md
+    must_read:
+      - docs/playbooks/accept-feature.md
+      - docs/features/_TEMPLATE/accept.md
+      - docs/harness/invariants.md
+      - AGENTS.md
+
   example-add-feature:
     summary: 示例业务任务（请改成真实任务）
     playbook: docs/playbooks/example-add-feature.md

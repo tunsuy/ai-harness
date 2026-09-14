@@ -35,6 +35,7 @@ python3 -m ai_harness init --name MyApp
 | `scaffold/` | `init` 拷贝到目标仓的模板 |
 | `src/ai_harness/` | CLI（`init` / `upgrade` 占位） |
 | `docs/WHAT_IS_GENERIC.md` | 引擎 vs 项目填充物边界 |
+| `docs/PRODUCT_PIPELINE.md` | OPC 产品流水线：Define → Design → Build → Accept |
 | `docs/decisions/` | 框架级 ADR（指导/门禁/SSOT/handoff/硬拦） |
 | `examples/` | 如何从 TokenStore 风格接约定 |
 

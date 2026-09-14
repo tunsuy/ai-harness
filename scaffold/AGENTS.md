@@ -6,6 +6,13 @@
 
 {{PROJECT_ONE_LINER}}
 
+## 产品流水线（定义 / 验收）
+
+新功能默认：`define-feature` →（必要则 ADR）→ 实现 playbook → `accept-feature` → 合入。  
+DoR/DoD 与角色边界见引擎说明；项目可加 `docs/product-pipeline.md` 附录。Brief/Accept 工件在 `docs/features/<id>/`。
+
+禁止：Brief 未 `approved` 就开业务实现；Accept 角色改产品代码「顺手修」。
+
 ## 开场三步（每次会话）
 
 1. 读 `docs/harness/handoff.md` → `make handoff`（+ `git log --oneline -5`）
@@ -50,6 +57,7 @@ make wip-save MSG="…"
 | 域/任务 | [docs/harness/domains.yaml](docs/harness/domains.yaml) · [tasks.yaml](docs/harness/tasks.yaml) |
 | 进度 | [docs/harness/handoff.md](docs/harness/handoff.md) · `make wip-save` |
 | HOW | [docs/playbooks/](docs/playbooks/) |
+| Feature Brief / Accept | [docs/features/](docs/features/) · `define-feature` / `accept-feature` |
 | 踩坑回流 | [docs/playbooks/harness-feedback.md](docs/playbooks/harness-feedback.md) |
 | 硬拦策略 | [docs/harness/policy.yaml](docs/harness/policy.yaml) |
 | WHY | [docs/decisions/](docs/decisions/) |
