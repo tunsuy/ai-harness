@@ -20,8 +20,23 @@ ROOT = Path(__file__).resolve().parents[1]
 DOMAINS = ROOT / "docs/harness/domains.yaml"
 TASKS = ROOT / "docs/harness/tasks.yaml"
 ARCH = ROOT / "docs/architecture.md"
+HANDOFF = ROOT / "docs/harness/handoff.md"
 BEGIN = "<!-- BEGIN_DOMAINS_TABLE -->"
 END = "<!-- END_DOMAINS_TABLE -->"
+CODEISH_PREFIXES = ("services/", "pkg/", "apps/", "api/", "src/", "deploy/migrations/")
+BRIEF_EXEMPT_TASKS = frozenset(
+    {
+        "define-feature",
+        "accept-feature",
+        "maintain-knowledge",
+        "harness-feedback",
+        "resume",
+        "l1-micro",
+        "example-add-feature",
+    }
+)
+BRIEF_STATUSES = frozenset({"draft", "approved", "superseded"})
+ACCEPT_STATUSES = frozenset({"in_progress", "PASS", "FAIL"})
 
 
 def load_yaml(path: Path) -> dict:
@@ -116,7 +131,167 @@ def check_tasks(data: dict, domain_names: set[str]) -> list[str]:
         d = t.get("domain")
         if d and d not in domain_names:
             errs.append(f"task {tid}: domain {d} 不在 domains.yaml")
+        for brief in t.get("require_brief_approved") or []:
+            if not isinstance(brief, str) or not brief.strip():
+                errs.append(f"task {tid}: require_brief_approved 项非法")
+                continue
+            if not (ROOT / brief).is_file():
+                errs.append(f"task {tid}: require_brief_approved 不存在: {brief}")
+                continue
+            st = brief_status(brief)
+            if st is None:
+                errs.append(f"task {tid}: {brief} 缺少状态行")
+            elif st not in BRIEF_STATUSES:
+                errs.append(f"task {tid}: {brief} 状态无法识别: {st!r}")
     return errs
+
+
+def _status_from_backticks(line: str) -> str | None:
+    s = line.strip()
+    if "状态" not in s:
+        return None
+    m = re.search(r"状态\s*[：:]\s*`([^`]+)`", s)
+    if m:
+        return m.group(1).strip()
+    m = re.search(r"状态\s*[：:]\s*(\S+)", s)
+    if m:
+        return m.group(1).strip().strip("*").strip()
+    return None
+
+
+def brief_status(rel_path: str) -> str | None:
+    text = (ROOT / rel_path).read_text(encoding="utf-8")
+    for line in text.splitlines()[:40]:
+        st = _status_from_backticks(line)
+        if st:
+            return st
+    return None
+
+
+def accept_status(rel_path: str) -> str | None:
+    text = (ROOT / rel_path).read_text(encoding="utf-8")
+    for line in text.splitlines()[:40]:
+        st = _status_from_backticks(line)
+        if st in ACCEPT_STATUSES:
+            return st
+        if st and st.upper() in ("PASS", "FAIL"):
+            return st.upper()
+    return None
+
+
+def parse_handoff_fields() -> dict[str, str | None]:
+    out: dict[str, str | None] = {
+        "status": None,
+        "task": "",
+        "feature": "",
+        "phase": "",
+    }
+    if not HANDOFF.is_file():
+        return out
+    for line in HANDOFF.read_text(encoding="utf-8").splitlines():
+        for key in ("status", "task", "feature", "phase"):
+            if line.startswith(f"{key}:"):
+                raw = line.split(":", 1)[1].strip().strip('"').split("#", 1)[0].strip()
+                out[key] = raw.split()[0] if key == "status" and raw else raw
+    return out
+
+
+def task_brief_exempt(tid: str, t: dict) -> bool:
+    if t.get("brief_exempt") is True:
+        return True
+    return tid in BRIEF_EXEMPT_TASKS
+
+
+def git_changed_vs_main() -> list[str]:
+    import subprocess
+
+    paths: set[str] = set()
+    for base in ("origin/main", "main"):
+        r = subprocess.run(
+            ["git", "diff", "--name-only", f"{base}...HEAD"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if r.returncode == 0:
+            paths.update(p for p in r.stdout.splitlines() if p.strip())
+            break
+    r2 = subprocess.run(
+        ["git", "status", "--porcelain", "-u"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if r2.returncode == 0:
+        for line in r2.stdout.splitlines():
+            if len(line) < 4:
+                continue
+            rest = line[3:].strip()
+            if " -> " in rest:
+                rest = rest.split(" -> ", 1)[1]
+            paths.add(rest.strip('"'))
+    return sorted(paths)
+
+
+def is_codeish(path: str) -> bool:
+    return any(path.startswith(p) for p in CODEISH_PREFIXES)
+
+
+def check_brief_before_code(tasks: dict) -> list[str]:
+    meta = parse_handoff_fields()
+    status, task = meta.get("status"), meta.get("task") or ""
+    feature = (meta.get("feature") or "").strip()
+    phase = (meta.get("phase") or "").strip()
+    if status not in ("active", "blocked") or not task:
+        return []
+    t = tasks.get(task) or {}
+    dirty = [p for p in git_changed_vs_main() if is_codeish(p)]
+    if not dirty:
+        return []
+    errs: list[str] = []
+    sample = ", ".join(dirty[:12]) + ("…" if len(dirty) > 12 else "")
+    explicit = [
+        b
+        for b in (t.get("require_brief_approved") or [])
+        if brief_status(b) != "approved"
+    ]
+    if explicit:
+        errs.append(
+            f"task `{task}` Brief 未 approved（{', '.join(explicit)}），禁改代码：{sample}"
+        )
+    if task_brief_exempt(task, t) and not explicit:
+        return errs
+    if phase in ("build", "design") and not feature:
+        errs.append(
+            f"phase={phase} 须 handoff.feature + Brief approved 才能改代码：{sample}"
+        )
+    elif feature:
+        bp = f"docs/features/{feature}/brief.md"
+        if not (ROOT / bp).is_file() or brief_status(bp) != "approved":
+            errs.append(f"feature=`{feature}` Brief 未 approved，禁改代码：{sample}")
+    return errs
+
+
+def check_accept_pass(tasks: dict) -> list[str]:
+    meta = parse_handoff_fields()
+    feature = (meta.get("feature") or "").strip()
+    task = meta.get("task") or ""
+    t = tasks.get(task) or {} if task else {}
+    need = bool(t.get("require_accept_pass"))
+    if feature and task and not task_brief_exempt(task, t):
+        need = True
+    if feature and (meta.get("phase") or "") == "accept":
+        need = True
+    if not need:
+        return []
+    if not feature:
+        return ["require_accept_pass 但 handoff.feature 为空"]
+    ap = f"docs/features/{feature}/accept.md"
+    if not (ROOT / ap).is_file():
+        return [f"缺少 {ap}（accept-feature → PASS）"]
+    if accept_status(ap) != "PASS":
+        return [f"{ap} 须 PASS 才能合入（当前 {accept_status(ap)!r}）"]
+    return []
 
 
 def resolve_domain_files(name: str, d: dict, _data: dict) -> list[str]:
@@ -130,7 +305,12 @@ def resolve_domain_files(name: str, d: dict, _data: dict) -> list[str]:
 def cmd_check() -> int:
     dom = load_yaml(DOMAINS)
     tsk = load_yaml(TASKS)
-    errs = check_domains(dom) + check_tasks(tsk, set((dom.get("domains") or {})))
+    tasks = tsk.get("tasks") or {}
+    errs = (
+        check_domains(dom)
+        + check_tasks(tsk, set((dom.get("domains") or {})))
+        + check_brief_before_code(tasks)
+    )
     if errs:
         print("==> KB sync FAIL")
         for e in errs:
@@ -141,7 +321,23 @@ def cmd_check() -> int:
     print("  [PASS] 域元数据 + exemplar")
     print("  [PASS] architecture 域表与 domains.yaml 同步")
     print("  [PASS] tasks.yaml 路径有效")
-    print("KB sync: 3 通过, 0 失败")
+    print("  [PASS] Brief 未 approved 未抢跑代码路径")
+    print("KB sync: 4 通过, 0 失败")
+    return 0
+
+
+def cmd_check_ship() -> int:
+    ec = cmd_check()
+    if ec != 0:
+        return ec
+    tasks = (load_yaml(TASKS).get("tasks") or {})
+    errs = check_accept_pass(tasks)
+    if errs:
+        print("==> product ship gate FAIL")
+        for e in errs:
+            print(f"  [FAIL] {e}")
+        return 1
+    print("  [PASS] feature Accept 准出（check-ship）")
     return 0
 
 
@@ -199,6 +395,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Knowledge-base sync (ai-harness)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("check")
+    sub.add_parser("check-ship", help="合入前：check + Accept PASS")
     sub.add_parser("gen")
     p = sub.add_parser("pack")
     p.add_argument("task")
@@ -206,6 +403,8 @@ def main() -> int:
     args = ap.parse_args()
     if args.cmd == "check":
         return cmd_check()
+    if args.cmd == "check-ship":
+        return cmd_check_ship()
     if args.cmd == "gen":
         return cmd_gen()
     if args.cmd == "pack":
