@@ -8,5 +8,7 @@
 
 阶段结束：更新 handoff + `make wip-save MSG="…"`（仅 `ai/*`|`feat/*`）。
 
+收工 / 用户说合并：默认 push → PR → **`make pr-merge PR=<n>`**（等 CI 绿再 squash；勿再问是否合并）。禁直推 main / 裸 `gh pr merge`；「先别合」口头可覆盖。
+
 入口：`AGENTS.md`；硬约定：`docs/harness/invariants.md`。
-硬拦由 `.agents/hooks.json`（agy CLI）执行；IDE 侧 hooks 可能尚未接线，仍以 CI/check 为准。
+硬拦由 `.agents/hooks.json`（agy CLI）执行；IDE 侧 hooks 可能尚未接线，仍以 CI/`make check-harness` 为准。

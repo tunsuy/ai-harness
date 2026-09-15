@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .cursor/hooks/deny-dangerous-shell.py"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.cursor/hooks/deny-dangerous-shell.py\""
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .cursor/hooks/deny-forbidden-paths.py"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.cursor/hooks/deny-forbidden-paths.py\""
           }
         ]
       }

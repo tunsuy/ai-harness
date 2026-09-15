@@ -1,4 +1,14 @@
 # 任务路由表 —— 冷启动只读清单（禁止先全库探索）
+# AI：先 `make context-pack TASK=<id> DOMAIN=<域>`，只读输出中的文件，再动手。
+# 检查：scripts/kb_sync.py check（含 Brief/ADR 抢跑闸）/ check-ship（合入 Accept PASS）
+#
+# 产品流水线字段（可选）：
+#   require_brief_approved: [docs/features/<id>/brief.md]  — 未 approved 禁 codeish
+#   require_adr_accepted: [docs/decisions/ADR-….md]         — 仍「提议中」禁 codeish
+#   require_accept_pass: true                              — 合入须 accept.md PASS
+#   brief_exempt: true                                     — 不要求 handoff.feature（微改/历史 playbook）
+# 默认豁免 task：define-feature / accept-feature / maintain-knowledge / harness-feedback /
+#   resume / troubleshoot / l1-micro（见 kb_sync.BRIEF_EXEMPT_TASKS）
 version: 1
 
 tasks:
@@ -50,6 +60,11 @@ tasks:
     summary: 示例业务任务（请改成真实任务）
     playbook: docs/playbooks/example-add-feature.md
     require_domain: true
+    brief_exempt: true  # 脚手架示例；真实新功能勿豁免，用 require_brief_approved + feature
+    # require_adr_accepted:
+    #   - docs/decisions/ADR-XXX.md
+    # require_brief_approved:
+    #   - docs/features/example/brief.md
     must_read:
       - docs/harness/domains.yaml
       - docs/architecture.md

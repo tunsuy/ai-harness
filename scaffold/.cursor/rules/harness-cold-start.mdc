@@ -16,8 +16,13 @@ alwaysApply: true
 - lint 绿 ≠ 完成；链路改动要跑项目 smoke。
 - 踩坑 → `docs/playbooks/harness-feedback.md`（加 check/hook，禁止只口头提醒）。
 
+# 收工
+
+- Verify 完成或用户说「合并」：默认 push → `gh pr create` → **`make pr-merge PR=<n>`**（等 CI 绿再 squash）；**禁止再问要不要合并**。
+- 禁 force-push / 直推 main / 裸 `gh pr merge`；用户口头「先别合」可覆盖。
+
 # 硬拦（hooks）
 
 - Cursor / Claude / Codex / Antigravity（`.agents/hooks.json`）共用 `.cursor/hooks/deny-*.py`
-- 禁写路径见 `docs/harness/policy.yaml`；禁 force-push / 直推 main / 危险 rm / curl|sh
+- 禁写路径见 `docs/harness/policy.yaml`；禁 force-push / 直推 main / 裸 `gh pr merge` / 危险 rm / curl|sh
 - 入口：`AGENTS.md`；硬约定：`docs/harness/invariants.md`

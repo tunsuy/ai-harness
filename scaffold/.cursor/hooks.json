@@ -3,19 +3,19 @@
   "hooks": {
     "sessionStart": [
       {
-        "command": "python3 .cursor/hooks/session-start.py",
+        "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)/.cursor/hooks/session-start.py\"'",
         "failClosed": false
       }
     ],
     "beforeShellExecution": [
       {
-        "command": "python3 .cursor/hooks/deny-dangerous-shell.py",
+        "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)/.cursor/hooks/deny-dangerous-shell.py\"'",
         "failClosed": true
       }
     ],
     "preToolUse": [
       {
-        "command": "python3 .cursor/hooks/deny-forbidden-paths.py",
+        "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)/.cursor/hooks/deny-forbidden-paths.py\"'",
         "matcher": "Write|Edit|TabWrite",
         "failClosed": true
       }

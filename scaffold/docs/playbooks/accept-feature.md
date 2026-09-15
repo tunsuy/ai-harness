@@ -14,17 +14,19 @@
 3. 复制/填写 `accept.md`（或更新已有）
 4. 跑项目约定的工程准出（check / test / smoke）
 5. **逐条** AC：执行或观察，写入证据（命令与摘要）
-6. 按风险分层完成人工勾选栏（S 必等人）
-7. Verdict：`PASS` 或 `FAIL`
-8. FAIL → handoff 写明打回阶段与阻塞项；**不要**在本角色里修代码
-9. PASS → 更新 handoff；交人闸 Ship / `pr-merge`
-10. `make wip-save MSG="accept: <id> PASS|FAIL"`
+6. 勾选 `docs/features/_accept-checklist.md` 中**适用**项
+7. 按风险分层完成人工勾选栏（S 必等人）
+8. Verdict：`PASS` 或 `FAIL`
+9. FAIL → handoff 写明打回阶段与阻塞项；**不要**在本角色里修代码
+10. PASS → 更新 handoff；交人闸 Ship → **`make pr-merge`**
+11. `make wip-save MSG="accept: <id> PASS|FAIL"`
 
 ## 完成自检
 
 - [ ] 每条 AC 有证据，无空「ok」
 - [ ] 未修改业务实现文件
 - [ ] FAIL 时未「顺手修」；PASS 时工程准出为绿
+- [ ] 滚动清单适用项已勾
 
 ## 与 Builder 隔离
 

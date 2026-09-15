@@ -1,7 +1,13 @@
 # features/
 
-Feature Brief / Accept 工件目录。
+Feature Brief / Accept / Prototype 工件。
 
-- 新功能：复制 `_TEMPLATE/` → `<feature-id>/`，先写 `brief.md`，合入前写 `accept.md`
-- 流程：`docs/playbooks/define-feature.md` · `accept-feature.md`
-- 引擎说明：ai-harness `docs/PRODUCT_PIPELINE.md`
+| 路径 | 用途 |
+|------|------|
+| `_TEMPLATE/` | 复制为新 `<id>/`（含 brief / accept / prototype） |
+| `_accept-checklist.md` | 滚动准出项（Accept 时勾适用项） |
+| `<id>/brief.md` | Define 产出 |
+| `<id>/prototype.md` + `prototype/vN/` | Design 原型闸（有 UI 时） |
+| `<id>/accept.md` | Accept 产出 |
+
+流程：引擎 `docs/PRODUCT_PIPELINE.md` · playbook `define-feature` / `accept-feature` · 项目可加 `docs/product-pipeline.md` 附录

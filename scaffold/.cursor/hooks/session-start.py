@@ -36,6 +36,22 @@ def handoff_status() -> str:
     return "unknown"
 
 
+def get_current_branch() -> str:
+    import subprocess
+
+    try:
+        r = subprocess.run(
+            ["git", "branch", "--show-current"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return r.stdout.strip()
+    except Exception:
+        return ""
+
+
 def read_payload() -> dict:
     if sys.stdin.isatty():
         return {}
@@ -52,10 +68,18 @@ def read_payload() -> dict:
 def main() -> int:
     payload = read_payload()
     st = handoff_status()
+    br = get_current_branch()
     name = project_name()
+    stale_note = ""
+    if br in ("main", "master") and st == "active":
+        stale_note = (
+            "\n⚠️  注意：当前在 main 分支但 handoff 为 active！"
+            "若前一任务已合入，请复位 status: idle。"
+        )
     ctx = (
         f"{name} harness 开场：\n"
-        f"1. 读 docs/harness/handoff.md（当前 status={st}）+ make handoff\n"
+        f"1. 读 docs/harness/handoff.md（当前 status={st}，branch={br or 'unknown'}）"
+        f"+ make handoff{stale_note}\n"
         "2. active/blocked → make context-pack TASK=<task> DOMAIN=<domain>，从 Next 续作\n"
         "3. 禁止先全库探索；用 context-pack 只读清单\n"
         "4. 阶段结束：更新 handoff + make wip-save MSG=…（仅 ai/*|feat/*）\n"

@@ -97,11 +97,12 @@ OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**�
 |------|--------|----------|
 | **Brief** | 新 feature / 大改范围 | 只写 `docs/features/**`；可读定位/roadmap/ADR |
 | **Architect** | DoR 中需 ADR 或跨域方案 | 写 ADR / task / playbook；不写业务实现 |
-| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；等人确认 |
+| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；按需用 `docs/design/references/` 选老师并记入 prototype；等人确认 |
+| **Critic** | 门面级 / 整页重做首轮，送人闸前 | **fresh-session**（不与出稿者共用上下文）：只读变体 + DESIGN 质量锚 + 参照记录，写 `prototype.md`「评审」节（逐变体逐条打分 + 排序 + 最大风险一句）；**不改 HTML、不做顺手修** |
 | **Builder** | Brief=`approved`、原型已确认（或豁免）、且 DoR 齐 | 现有 playbook；不改 AC；按确认变体落地 |
 | **Accept** | Build 自检完成 | 只读 + 跑验证；写 `accept.md`；不改产品代码 |
 
-独立会话优于同一会话「扮演多个角色」。Accept 不得与 Builder 共用未清上下文的长会话。
+独立会话优于同一会话「扮演多个角色」。Accept 不得与 Builder 共用未清上下文的长会话；Critic 同理，不得与 UI Prototype 共用。
 
 ## 与工程 harness 的关系
 
@@ -120,16 +121,23 @@ OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**�
 
 | 闸 | 何时 FAIL | 实现 |
 |----|-----------|------|
-| Brief 抢跑 | `active` + codeish diff（services/pkg/apps/api/migrations），且 Brief 未 `approved` | `kb_sync check` ← `make check` |
+| Brief 抢跑 | `active` + codeish diff（services/pkg/apps/packages/api/src/migrations），且 Brief 未 `approved` | `kb_sync check` ← `make check-harness` |
 | phase=build/design 无 feature | 同上且 task 非 `brief_exempt` | 同上 |
 | `require_brief_approved` | task 声明的 brief 未 approved 却改代码 | 同 ADR 闸 |
+| `require_adr_accepted` | task 声明的 ADR 仍「提议中」却改代码 | `kb_sync check` |
+| handoff.task | `active\|blocked` 时 task 空或不在 tasks.yaml | `kb_sync check` |
 | Accept 准出 | 合入时 `handoff.feature` 已挂且 accept ≠ PASS | `kb_sync check-ship` ← `pr-merge` |
+| 裸 merge | agent 直接 `gh pr merge` | hooks 硬拦；须 `make pr-merge` |
+
+原型闸目前以 **文档 + handoff `prototype_status`** 约束；未默认并入 `kb_sync` 硬 FAIL。若抢跑成常态，再加 `require_prototype_confirmed`。
 
 `tasks.yaml` 字段：
 
 ```yaml
 require_brief_approved:
   - docs/features/foo/brief.md
+require_adr_accepted:
+  - docs/decisions/ADR-XXX.md
 require_accept_pass: true   # 可选；挂了 feature 且非 exempt 时合入也会查
 brief_exempt: true          # 微改 / 流水线前存量 playbook
 ```
@@ -140,5 +148,5 @@ brief_exempt: true          # 微改 / 流水线前存量 playbook
 
 - 不照搬大厂 10 人评审会 / 专职 QA 编制
 - 不计费 / 账本类产品不当 Research Preview「先发后补」
-- 不一上来造 10+ agent；OPC 默认 Brief + Accept，Architect 按痛点加
-- 不在 Write hook 里拦每一文件（成本高）；靠 `make check` / `pr-merge` 与 ADR 闸同级失败
+- 不一上来造 10+ agent；OPC 默认 Brief + Accept，Architect / Critic 按痛点加
+- 不在 Write hook 里拦每一文件（成本高）；靠 `make check-harness` / `pr-merge` 与 ADR 闸同级失败
