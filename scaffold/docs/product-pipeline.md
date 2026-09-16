@@ -22,6 +22,16 @@ define-feature → UI 原型确认（若有界面）→（ADR 若需要）→ �
 
 **不部署 OpenDesign。** Agent 按本仓设计规范写出静态 HTML，发预览链接，人确认后再 Build。
 
+每轮流程（完整版见引擎 `docs/PRODUCT_PIPELINE.md`「UI Prototype Gate」）：
+
+```
+组件覆盖检查 → 画变体 → design-lint 每版过闸 → 两段式自评 → Critic（fresh-session） → 预览链接送人闸
+```
+
+- **组件覆盖检查**：本页用到的每个组件在项目 `DESIGN.md` 必须有规范行；没有的先补规范（值从参照库对照得出）再画，禁止临场拍值等人闸纠正。
+- **design-lint（Layer 1 机械门禁）**：`make design-lint DESIGN_LINT_TARGETS="docs/features/<id>/prototype/vN"`——表外色值/圆角/字号/字重 = error 必须清零；warning 逐条确认有 SSOT 依据。冲突时先改 DESIGN.md 再改原型。
+- **两段式自评**：先以第一次打开页面的用户身份看三档截图（1440/1024/375）修掉不适感，再按 DESIGN.md「质量锚」逐条自查。禁止第一稿直接送人闸。
+
 ### 设计参照（每轮原型建议）
 
 开写静态 HTML 前：按 [`docs/design/references/README.md`](design/references/README.md) 为当轮问题选 1–2 个老师品牌，把「问题 → 老师 → 学到什么」写进 `prototype.md` 设计约束段。学模式不搬 hex；晋升经验才改本仓 `DESIGN.md`。
@@ -98,5 +108,8 @@ Accept FAIL → Next 写打回阶段。原型被否 → `phase: design` + `proto
 | `make check-harness`（含 `kb_sync check`） | Brief/ADR 抢跑 |
 | `make check-ship` / `make pr-merge` | Accept PASS |
 | `make context-pack` | WARN：未 approved Brief / 提议中 ADR |
+| `make design-lint`（Layer 1） | DESIGN.md 表外硬编码值：色值/圆角/字号/字重 = error 阻断；高度/间距/rgba = warning |
+
+> design-lint 的 token 表自动解析自 `docs/design/DESIGN.md` front matter；项目在 `lint:` 块配 `targets`（实现树默认扫描范围）/ `heights` / `baseline`（已知历史漂移，折回后必须删条目）。接入项目 CI 时把 `node scripts/design-lint.js` 放进前端 workflow（纯 node 零依赖，可先于依赖安装跑）。
 
 > 原型闸默认以文档 + handoff 约束；若抢跑成常态，可在 `kb_sync` 加 `require_prototype_confirmed`。

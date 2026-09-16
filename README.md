@@ -44,6 +44,7 @@ python3 -m ai_harness init --name MyApp
 - 短地图 `AGENTS.md` + Gemini/Antigravity 入口
 - `docs/harness/{domains,tasks,policy,handoff,invariants}`
 - `make handoff` / `context-pack` / `wip-save` / `kb-gen` / `check-harness`
+- `make design-lint`：Layer-1 设计门禁——硬编码值必须命中项目 `DESIGN.md` token 表（front matter 自动解析，零依赖）
 - Cursor / Claude / Codex / Antigravity 共用策略脚本（`policy.yaml` 可配禁写路径）
 
 ## 边界（必读）

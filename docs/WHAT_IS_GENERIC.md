@@ -15,8 +15,10 @@
 | 产品流水线（定义/验收） | `docs/PRODUCT_PIPELINE.md` + scaffold `define-feature` / `accept-feature` + `docs/features/_TEMPLATE/` |
 | 产品机械门禁 | scaffold `kb_sync.py`：`check`（Brief/ADR 抢跑、handoff.task）/ `check-ship`（Accept PASS）；零依赖 YAML fallback |
 | 合入闸 | `pr-merge.sh` + hooks 禁裸 `gh pr merge`；合入后 handoff 复位 idle |
-| UI 原型模板 | `_TEMPLATE/prototype.md` + `_accept-checklist.md` 骨架 |
-| 设计参照库 | `docs/design/references/`（取法 + stripe 样例）；项目 `DESIGN.md` 骨架 |
+| UI 原型模板 | `_TEMPLATE/prototype.md`（含两段式 Critic 评审节 + 送闸前自查清单）+ `_accept-checklist.md` 骨架 |
+| 设计参照库 | `docs/design/references/`（取法 + stripe/vercel/posthog 样例 + `cn-design-systems/` 中文三家 token 级对照）；项目 `DESIGN.md` 骨架 |
+| Layer-1 设计门禁 | scaffold `scripts/design-lint.js`（token 表自动解析自项目 DESIGN.md front matter，零依赖）+ `make design-lint`；含 `lint.baseline` 已知漂移基线机制（折回后必须删条目）；三层门禁架构见 `PRODUCT_PIPELINE.md` |
+| 质量锚方法论 | scaffold `DESIGN.md` 骨架「质量锚」默认八条 + 两段式（观感先于核对）说明；锚条目项目可增删改 |
 | 可配置禁写 | `docs/harness/policy.yaml` |
 | Make 目标 | `Makefile.harness.mk`（含 `check-ship` / `pr-merge`） |
 | stale handoff | `handoff.sh` + session-start：main 上 `status: active` 警告 |
@@ -33,7 +35,7 @@
 | 语言/栈门禁 | golangci、depguard、DDL 检查 |
 | 行为 smoke / `ci-smoke` | 断言产品链路，不是 harness 本身 |
 | `policy.yaml` 里的只读树 | 如某仓的 `vendor/`、生成物目录 |
-| `docs/design/DESIGN.md` 与页模板 | 色板/气质/壳是产品填充物；引擎只给骨架 + 参照库取法 |
+| `docs/design/DESIGN.md` 与页模板 | 色板/气质/壳是产品填充物；引擎只给骨架 + 参照库取法 + 质量锚默认条目。`lint:` 块内容（targets/heights/baseline 条目）同属项目填充 |
 | 第三方 UI skills 的**源码树** | 由 `skills-lock` + `make skills-ui` 还原；引擎只锁版本不默认提交大树 |
 
 ## 约定

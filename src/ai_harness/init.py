@@ -147,5 +147,6 @@ def run_init(
     print("  1. Edit docs/harness/invariants.md, domains.yaml, policy.yaml")
     print("  2. pip3 install -r scripts/requirements-kb.txt")
     print("  3. make kb-gen && make check-harness")
-    print("  4. Open AGENTS.md — cold start from handoff")
+    print("  4. 有 UI：填 docs/design/DESIGN.md（tokens + lint: 块）→ make design-lint")
+    print("  5. Open AGENTS.md — cold start from handoff")
     return 0
