@@ -35,16 +35,18 @@ make handoff
 make wip-save MSG="…"
 make pr-merge PR=12     # 等 CI 绿再 squash（禁裸 gh pr merge）
 make skills-ui          # 从 skills-lock.json 还原推荐 UI skill（有界面项目建议跑一次）
+make design-lint        # Layer-1 设计门禁：硬编码值必须命中 docs/design/DESIGN.md token 表
 ```
 
 一次性：`pip3 install -r scripts/requirements-kb.txt`  
-有界面：`make skills-ui`（详见 [`.agents/skills/README.md`](.agents/skills/README.md)）
+有界面：`make skills-ui`（详见 [`.agents/skills/README.md`](.agents/skills/README.md)）；设计 SSOT 建好后 `make design-lint` 进日常验证（原型每版必跑：`node scripts/design-lint.js docs/features/<id>/prototype/vN`）
 
 ## 验证分级
 
 | 改动 | 最低验证 |
 |------|----------|
 | 任意 | `make check-harness`（再加项目自己的 build/lint） |
+| UI / 样式 / 原型 | + `make design-lint`（表外色值/圆角/字号/字重 = error；冲突先改 DESIGN.md 再改代码） |
 | 域/表/样板 | + `make kb-gen` 且 check 绿 |
 | 产品链路 | 项目自备 smoke（lint 绿 ≠ 完成） |
 | 合入 | `make pr-merge`（内含 `check-ship`） |

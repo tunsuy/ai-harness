@@ -13,6 +13,13 @@ TokenStore 是第一个完整消费者：路径约定（`services/console/{domai
 - hooks 用 `git rev-parse --show-toplevel` / `$CLAUDE_PROJECT_DIR` 解析仓根（cwd 无关）
 - cold-start 规则默认 `pr-merge`
 - 设计参照库：`docs/design/references/` 取法（awesome-design-md 落库、按轮选老师、学模式不搬值）+ stripe 样例
+- **（2026-09-16，keys-redesign 八轮人闸反馈回灌）**：
+  - Layer-1 设计门禁 `scaffold/scripts/design-lint.js` + `make design-lint`：硬编码色值/圆角/字号/字重必须命中项目 DESIGN.md token 表；token 表**自动解析自 front matter**（TokenStore 首版是硬编码表，通用化时改为解析器 + `lint:` 配置块）；`lint.baseline` 已知漂移基线（SSOT 已改、代码禁改期的过渡，折回后必须删条目——机制来自 tokens.css 四条真实漂移）
+  - 三层设计门禁架构（PRODUCT_PIPELINE「机械门禁」）：L1 token 合规（已带）→ L2 组件结构 AST（Build 期）→ L3 质量锚 Playwright 自动核对（Accept 期）
+  - 质量锚方法论进 DESIGN.md 骨架：默认八条（一页一语法 / 节奏量级 / 产品工件锚 / 字号阶梯 / 密度一致 / 断点完整 / CJK 已知坑 / 双语韧性）+「观感先于核对」两段式
+  - 流程硬化进原型闸：**组件覆盖检查**（无规范行的组件先补规范再画，禁临场拍值）、每版必过 design-lint、**两段式自评**（禁第一稿直送人闸）、Critic 两段式评审节进 `_TEMPLATE/prototype.md`
+  - 参照库扩容：awesome-design-md 补 vercel / posthog；新增 `cn-design-systems/`（Ant/Arco/TDesign 源码级 token 对照——整页观感与单格取值两库分工）
+  - 治理模式进 DESIGN.md 骨架提示：色板纪律五条 / 用色决策表 / 组件规格矩阵（全变体×全状态）/ 表格列对齐成对声明
 
 ## 仍留在 TokenStore（勿回灌引擎）
 

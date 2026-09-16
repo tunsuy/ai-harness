@@ -40,9 +40,12 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 
 1. Brief = `approved` 后进入 Design。
 2. Agent 只写 `docs/features/<id>/prototype/` 下的**自包含静态 HTML**（可多变体 `v1/` `v2/`），**不改** `apps/` / `packages/` / `services/` 等实现树。
-3. 发布可点开的 HTTPS（或内网）预览链接；更新 `docs/features/<id>/prototype.md`（状态 `pending`）。
-4. 人确认变体（微信口令：`确认 A` / `确认 B` / `改：…` / `重出`）→ `prototype.md` 标 `confirmed` + 选中变体。
-5. 再进 Build：按项目 UI 规范与 tokens **重做进生产组件**；静态原型不是生产源。
+3. **组件覆盖检查**（每轮开画前）：列出本页用到的全部组件（按钮 / 输入框 / 选择器 / 复选框 / 弹窗 / 徽章 / 表格 / …），逐个对项目 `DESIGN.md` 找规范行——**任何没有规范行的组件，必须先补规范再画**：值从 `docs/design/references/` 对照得出、写进 DESIGN.md，并在 prototype.md 记「本轮补规范」清单。禁止先画再等人闸纠正（TokenStore keys v4 教训：控件高度 34px 系临场拍值，SSOT 从未定义，人闸被迫当第一道规范审）。已过覆盖检查的组件后续页面直接继承，不再逐页仲裁。
+4. 每版写完必过 **Layer 1 设计门禁**：`node scripts/design-lint.js docs/features/<id>/prototype/vN`——表外硬编码色值 / 圆角 / 字号 / 字重 = error，清零才进自评；高度 / 间距 / rgba = warning，逐条确认有 SSOT 依据。lint 与设计决策冲突时**先改 DESIGN.md（走参照对照 + 记录）再改原型**；禁止为过闸临场拍值、禁止往 token 表塞无出处的值。
+5. **送人闸前自评（两段式，顺序不可换）**：① 先以「第一次打开页面的用户」身份看三档截图（1440 / 1024 / 375，full-page），记录所有不适感（间距 / 密度 / 字重 / 层级 / 对齐）并修掉；② 再按 DESIGN.md「质量锚」逐条自查（过 / 不过 + 定位到行）。观感先于核对，防止锚把眼睛框住。**禁止把第一稿直接发给人闸。**
+6. Critic 评审（见「Agent 角色约定」）→ 发布可点开的 HTTPS（或内网）预览链接 → 更新 `docs/features/<id>/prototype.md`（状态 `pending`）。
+7. 人确认变体（微信口令：`确认 A` / `确认 B` / `改：…` / `重出`）→ `prototype.md` 标 `confirmed` + 选中变体。
+8. 再进 Build：按项目 UI 规范与 tokens **重做进生产组件**；静态原型不是生产源。
 
 模板：`scaffold/docs/features/_TEMPLATE/prototype.md`（项目可镜像到 `docs/features/_TEMPLATE/`）。
 
@@ -97,8 +100,8 @@ OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**�
 |------|--------|----------|
 | **Brief** | 新 feature / 大改范围 | 只写 `docs/features/**`；可读定位/roadmap/ADR |
 | **Architect** | DoR 中需 ADR 或跨域方案 | 写 ADR / task / playbook；不写业务实现 |
-| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；按需用 `docs/design/references/` 选老师并记入 prototype；等人确认 |
-| **Critic** | 门面级 / 整页重做首轮，送人闸前 | **fresh-session**（不与出稿者共用上下文）：只读变体 + DESIGN 质量锚 + 参照记录，写 `prototype.md`「评审」节（逐变体逐条打分 + 排序 + 最大风险一句）；**不改 HTML、不做顺手修** |
+| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；**开画前组件覆盖检查**（无规范行的组件先补规范）；**每版必过 `design-lint`**（Layer 1，error 清零）；**送闸前两段式自评**；按需用 `docs/design/references/` 选老师并记入 prototype；等人确认 |
+| **Critic** | 所有送人闸的原型，送闸前 | **fresh-session**（不与出稿者共用上下文），**两段式、顺序不可换**：先「第一眼观感」（只看三档截图/预览链接，记录不适感，禁止先读锚；**出报告前逐条回源核实**——对照 HTML 源码/复查截图确认元素存在，找不到源的可疑条目剔除，观感只采信已核实条目）→ 再「质量锚核对」（变体 + DESIGN 质量锚 + 参照记录，逐条打分 + 排序 + 最大风险一句）；写 `prototype.md`「评审」节；**不改 HTML、不做顺手修**。复用既有页模板只豁免双变体要求，不豁免 Critic |
 | **Builder** | Brief=`approved`、原型已确认（或豁免）、且 DoR 齐 | 现有 playbook；不改 AC；按确认变体落地 |
 | **Accept** | Build 自检完成 | 只读 + 跑验证；写 `accept.md`；不改产品代码 |
 
@@ -128,6 +131,9 @@ OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**�
 | handoff.task | `active\|blocked` 时 task 空或不在 tasks.yaml | `kb_sync check` |
 | Accept 准出 | 合入时 `handoff.feature` 已挂且 accept ≠ PASS | `kb_sync check-ship` ← `pr-merge` |
 | 裸 merge | agent 直接 `gh pr merge` | hooks 硬拦；须 `make pr-merge` |
+| 设计 token 合规（Layer 1） | 实现树 / 原型出现 DESIGN.md 表外硬编码色值、圆角、字号、字重 | `scripts/design-lint.js` ← `make design-lint` / CI；token 表自动解析自 DESIGN.md front matter，项目只填 `lint:` 块；已知历史漂移登记 `lint.baseline`（降级不阻断，**折回后必须删条目**） |
+
+**设计门禁三层**（TokenStore keys-redesign 实践固化）：**Layer 1 token 合规**（`design-lint.js`，值级——「值对了吗」，scaffold 已带）；**Layer 2 组件结构**（AST 检查按钮层级纪律 / 表头单元格对齐成对声明等结构规则——「结构对了吗」，项目进 Build 期按需落）；**Layer 3 质量锚自动核对**（Playwright 渲染取实测值逐锚核对——「页面对了吗」，Accept 期按需落）。三层互不替代；L1 之外两层引擎不预置实现，只在文档固化架构位。
 
 原型闸目前以 **文档 + handoff `prototype_status`** 约束；未默认并入 `kb_sync` 硬 FAIL。若抢跑成常态，再加 `require_prototype_confirmed`。
 

@@ -2,12 +2,14 @@
 
 > 用途：设计任务（原型闸轮次 / 新页面 / 重设计）前的**参照系**输入——agent 缺少「见过好设计」的锚点，从这里取。  
 > 来源：[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)（MIT · 多品牌 DESIGN.md 文字设计系统 · Google Stitch [DESIGN.md](https://stitch.withgoogle.com/docs/design-md/overview/) 约定）
+>
+> 另有 [`cn-design-systems/`](./cn-design-systems/README.md)：Ant / Arco / TDesign 三家中文设计系统的 **token 级**源码对照——**本库看整页观感，那边看单格字号 / 字重 / 密度该是什么值**。两库互补，选老师先分清当轮问题是「观感」还是「值」。
 
 ## 取法
 
 **品牌文件直接落库**（`awesome-design-md/<brand>/DESIGN.md`，上游 LICENSE 随附）——换机器 / 新 clone 免拉取，每个品牌的网络成本只付一次。目录随轮次有机生长：当轮需要哪个品牌，拉完提交进库。
 
-脚手架默认带 **stripe** 首份样例；其它品牌按需追加。
+脚手架默认带 **stripe / vercel / posthog** 三份样例（产品公司派）+ **cn-design-systems**（中文组件库派 token 对照）；其它品牌按需追加。
 
 ```bash
 # 新增品牌 / 刷新（主力：jsDelivr fastly 节点）
