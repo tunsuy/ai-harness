@@ -19,6 +19,10 @@ python3 -m pip install -e /path/to/ai-harness
 ai-harness init --name MyApp --one-liner "一句话产品定义"
 # 或
 python3 -m ai_harness init --name MyApp
+
+# 已有项目对齐新版引擎（只刷引擎文件，不碰业务填充）
+ai-harness upgrade
+ai-harness upgrade --dry-run   # 只看会改什么
 ```
 
 然后：
@@ -27,13 +31,15 @@ python3 -m ai_harness init --name MyApp
 2. 写业务 playbook；`tasks.yaml` 挂上路由
 3. Makefile 已 include `Makefile.harness.mk`（或按提示手动加）
 4. `pip3 install -r scripts/requirements-kb.txt` → `make kb-gen && make check-harness`
+5. 有 UI：填 `docs/design/DESIGN.md`（tokens + `lint:` 块）→ `make design-lint`
+6. 已有项目跟新版引擎：`ai-harness upgrade`（先 `--dry-run`）
 
 ## 仓库结构
 
 | 路径 | 职责 |
 |------|------|
 | `scaffold/` | `init` 拷贝到目标仓的模板 |
-| `src/ai_harness/` | CLI（`init` / `upgrade` 占位） |
+| `src/ai_harness/` | CLI（`init` / `upgrade`） |
 | `docs/WHAT_IS_GENERIC.md` | 引擎 vs 项目填充物边界 |
 | `docs/PRODUCT_PIPELINE.md` | OPC 产品流水线：Define → Design → Build → Accept |
 | `docs/decisions/` | 框架级 ADR（指导/门禁/SSOT/handoff/硬拦） |
@@ -53,4 +59,5 @@ python3 -m ai_harness init --name MyApp
 
 ## 与 TokenStore
 
-TokenStore 仍是第一个完整消费者；后续可用本包 `upgrade`（规划中）对齐 hooks/脚本，业务 yaml 永不被覆盖。
+TokenStore 仍是第一个完整消费者；用 `ai-harness upgrade` 对齐 hooks/脚本/playbook/参照库等**引擎清单**。  
+永不覆盖：`domains.yaml` / `invariants.md` / `handoff.md` / `policy.yaml` / `tasks.yaml` / `DESIGN.md` / `product-pipeline.md` / `AGENTS.md` 等项目填充（见 `docs/WHAT_IS_GENERIC.md`）。
