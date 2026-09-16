@@ -42,4 +42,4 @@
 
 1. **scaffold 默认 `conventions.mode: metadata_only`**：只强制 exemplar / 域表同步 / 任务路径；不假设 Go console 布局。
 2. 需要 TokenStore 式「文件名=域名」时，在项目里扩展 `kb_sync.py` 或参考 `examples/`。
-3. `ai-harness upgrade`（规划）只更新引擎文件清单，永不覆盖 `domains.yaml` / `invariants.md` / `handoff.md`。
+3. `ai-harness upgrade` 只更新引擎文件清单（`scripts/`、hooks、skills、`_TEMPLATE/`、参照库、`Makefile.harness.mk`、playbooks 等），永不覆盖 `domains.yaml` / `invariants.md` / `handoff.md` / `policy.yaml` / `tasks.yaml` / `DESIGN.md` / `product-pipeline.md` / `AGENTS.md` 等填充物。可用 `--dry-run` 预览。

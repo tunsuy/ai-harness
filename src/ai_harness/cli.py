@@ -6,12 +6,13 @@ import sys
 
 from ai_harness import __version__
 from ai_harness.init import run_init
+from ai_harness.upgrade import run_upgrade
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         prog="ai-harness",
-        description="AI-native project harness: init scaffold into a repo",
+        description="AI-native project harness: init / upgrade scaffold into a repo",
     )
     ap.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -31,14 +32,19 @@ def main(argv: list[str] | None = None) -> int:
     p_init.add_argument(
         "--force",
         action="store_true",
-        help="Overwrite existing scaffold files (never handoff.md)",
+        help="Overwrite existing scaffold files (never protected project fill)",
     )
 
     p_up = sub.add_parser(
         "upgrade",
-        help="Update engine files from a newer ai-harness (planned)",
+        help="Update engine files from the current ai-harness scaffold",
     )
-    p_up.add_argument("--target", default=".")
+    p_up.add_argument("--target", default=".", help="Project root (default: cwd)")
+    p_up.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would change without writing",
+    )
 
     args = ap.parse_args(argv)
     if args.cmd == "init":
@@ -49,12 +55,7 @@ def main(argv: list[str] | None = None) -> int:
             force=args.force,
         )
     if args.cmd == "upgrade":
-        print(
-            "upgrade: not implemented yet. "
-            "Re-run init --force on engine paths only, or sync from scaffold/ manually.",
-            file=sys.stderr,
-        )
-        return 2
+        return run_upgrade(target=args.target, dry_run=args.dry_run)
     return 2
 
 
