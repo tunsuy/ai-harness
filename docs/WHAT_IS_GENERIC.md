@@ -9,13 +9,15 @@
 | 会话交接 + git WIP | `handoff.md` + `handoff.sh` + `wip-save.sh` |
 | Agent 硬拦适配 | `policy_lib` + Cursor/Claude/Codex/Antigravity hooks（含 repo-root 解析） |
 | 产品流水线 skills | `.agents/skills/` + `.claude/skills/`：`product-brief` / `product-accept` / `product-prototype` |
-| UI skill 推荐包 | scaffold `skills-lock.json` + `make skills-ui`（`npx skills experimental_install`）；不整包 vendoring |
+| UI skill 推荐包 | scaffold `skills-lock.json` + `make skills-ui`（`npx skills experimental_install`）；不整包 vendoring。含 Stitch 官方 skills（`enhance-prompt` / `stitch::generate-design` / `stitch::manage-design-system`，准入映射见 PRODUCT_PIPELINE） |
+| Stitch MCP 接入 | 文档指引（端点 / 认证头）+ 准入纪律；凭证与 MCP 注册属项目/用户配置，引擎不含 |
 | 冷启动 Always-On | `.cursor/rules` + `.agents/rules`（含默认 `pr-merge`） |
 | 失败回流 | playbook `harness-feedback.md` |
 | 产品流水线（定义/验收） | `docs/PRODUCT_PIPELINE.md` + scaffold `define-feature` / `accept-feature` + `docs/features/_TEMPLATE/` |
 | 产品机械门禁 | scaffold `kb_sync.py`：`check`（Brief/ADR 抢跑、handoff.task）/ `check-ship`（Accept PASS）；零依赖 YAML fallback |
 | 合入闸 | `pr-merge.sh` + hooks 禁裸 `gh pr merge`；合入后 handoff 复位 idle |
-| UI 原型模板 | `_TEMPLATE/prototype.md`（含两段式 Critic 评审节 + 送闸前自查清单）+ `_accept-checklist.md` 骨架 |
+| UI 原型模板 | `_TEMPLATE/prototype.md`（含两段式 Critic 评审节 + 送闸前自查清单 + Concept 方向来源行）+ `_accept-checklist.md` 骨架 |
+| Concept Sketch（可选概念工具） | 引擎 `PRODUCT_PIPELINE.md` 一节：Stitch 等无约束出方向，产出隔离在项目 `docs/features/<id>/concept/`，人闸选产品形态；原型闸内 token 重做；含官方 skill 准入映射（✅ 生成类 / ⚠️ 设计系统仅 Build 期辅助 / ❌ 反向 DESIGN.md 与 screen→code 类） |
 | 设计参照库 | `docs/design/references/`（取法 + stripe/vercel/posthog 样例 + `cn-design-systems/` 中文三家 token 级对照）；项目 `DESIGN.md` 骨架 |
 | Layer-1 设计门禁 | scaffold `scripts/design-lint.js`（token 表自动解析自项目 DESIGN.md front matter，零依赖）+ `make design-lint`；含 `lint.baseline` 已知漂移基线机制（折回后必须删条目）；三层门禁架构见 `PRODUCT_PIPELINE.md` |
 | 质量锚方法论 | scaffold `DESIGN.md` 骨架「质量锚」默认八条 + 两段式（观感先于核对）说明；锚条目项目可增删改 |

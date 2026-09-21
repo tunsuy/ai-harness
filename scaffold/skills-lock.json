@@ -60,6 +60,24 @@
       "sourceType": "github",
       "skillPath": "skills/review-animations/SKILL.md",
       "computedHash": "b9f669af5ae280c19a592a94611520335a81de25c88f225bf60ae4b2d66c8c7c"
+    },
+    "enhance-prompt": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/stitch-utilities/skills/enhance-prompt/SKILL.md",
+      "computedHash": "71cc23e9ec5fc6361e12453495fa8c683f6cf26f3efaf9b230b0f43e0a32cc96"
+    },
+    "stitch::generate-design": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/stitch-design/skills/generate-design/SKILL.md",
+      "computedHash": "c5cf0685e477166e16283b5c2ee08c5b5022f0712d2a5988fdb475a9de79ad40"
+    },
+    "stitch::manage-design-system": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/stitch-design/skills/manage-design-system/SKILL.md",
+      "computedHash": "e55ef1adf10175b9ce3915f0bc7208904805ff14ce954349365dc5aabaa8359b"
     }
   }
 }

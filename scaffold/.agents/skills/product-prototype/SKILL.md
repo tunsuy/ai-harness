@@ -23,6 +23,7 @@ You are the **UI Prototype** role in Design. Produce static HTML variants and wa
 
 1. Brief 未 `approved` → 拒绝开写原型。
 2. 只写 `docs/features/<id>/prototype/vN/` + `prototype.md`；**禁止**改 `apps/` / `packages/` / `src/` 等实现树。
+3. 若上游有 Concept Sketch（Stitch 等概念工具出的方向，`concept/` 或链接）：原型**重做**该方向（信息架构 / 页面内容），**不临摹其样式值**——色值/圆角/间距一概不回流，一切以 DESIGN.md token 与参照库为准；在 `prototype.md` 第 1 节「上游方向」记录来源。无 Concept 时跳过此条。
 3. **开画前组件覆盖检查**：列出本页全部组件，逐个对 DESIGN.md 找规范行——没有规范行的组件**先补规范再画**（值从参照库对照得出，写进 DESIGN.md 并在 prototype.md 记「本轮补规范」）。禁止临场拍值等人闸纠正。
 4. 有明显布局/视觉探索时：先按参照库取法选 1–2 个老师，在 `prototype.md` 记录「问题 → 老师 → 学到什么」；**学模式，不搬品牌 hex/字体/logo**。
 5. **每版写完必过 Layer-1 设计门禁**：`node scripts/design-lint.js docs/features/<id>/prototype/vN`——error（表外色值/圆角/字号/字重）清零才进自评；warning 逐条确认有 SSOT 依据。lint 与设计决策冲突时**先改 DESIGN.md（走参照对照 + 记录）再改原型**；禁止为过闸往 token 表塞无出处的值。

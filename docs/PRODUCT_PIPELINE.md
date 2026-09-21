@@ -11,7 +11,7 @@
 ```
 Define ──► Design ──► Build ──► Accept ──► Learn
   ↑人闸1     ↑人闸2              ↑人闸3
-             （含 UI 原型确认，若适用）
+             （可先经 Concept Sketch 选方向；含 UI 原型确认，若适用）
 ```
 
 | 阶段 | 角色（agent） | 产出物 | 禁止 |
@@ -30,6 +30,34 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 4. **Ship**：Accept = PASS 且风险分层要求的人工勾选完成
 
 中间劳动（调研稿、ADR 草稿、原型 HTML、编码、跑测）交给 agent。
+
+## Concept Sketch（可选，Stitch 等概念工具）
+
+> 适用：Brief 通过后、进原型闸**之前**，想先看「产品长什么样」的几个方向（信息架构 / 页面上有什么 / 密度与气质）。也可前移到 Brief 之前当纯想法生成用。**可选增强，不是任何闸的前置条件**（与 OpenDesign 同级待遇）。
+
+**定位：发散，不收敛。** Stitch（或任何 AI 概念生成工具）在**无约束**下天马行空出方向——不看 DESIGN.md、不碰 token、不跑 lint。约束下的收敛是原型闸的事，两件事不压在同一轮：方向没想清前，token 合规的原型画得再好也是白画。
+
+```
+Brief approved ──► Concept Sketch（无约束发散，选方向）
+                        ↓ 人闸：选产品形态（不是选样式）
+                   Prototype Gate（方案 A，token 约束下重做）
+                        ↓ 人闸：确认原型
+                   Build
+```
+
+三条边界：
+
+1. **产出隔离**：Stitch 产出只放 `docs/features/<id>/concept/`（或仅留链接，不进仓库）；**禁止**进 `prototype/`——整套原型纪律（design-lint / 组件覆盖检查 / Critic）不为它开豁免，也不适用（本来就没打算让它合规）。静态产出不是生产源，更不是规范来源。
+2. **人闸问的是产品形态**：这页面该有什么、不该有什么、信息架构对不对。**必答一句：「这上面有哪些东西是我的 Brief 没定义的？」** 概念工具会替你发明功能/字段/流程；被你喜欢的发明回流去改 Brief/AC，而不是顺着画下去——禁止视觉工具偷偷做产品决策。
+3. **选中方向后进原型闸**：原型按项目 DESIGN.md 与 tokens **重做**，不临摹 Stitch 的值（色值/圆角/间距一概不回流）；方向参考记入 `prototype.md` 第 1 节。
+
+**执行方式（Stitch 官方 MCP + skills）**：Stitch 提供官方远程 MCP（`https://stitch.googleapis.com/mcp`，`X-Goog-Api-Key` 认证，key 在 stitch 设置页生成；属用户/项目一次性配置，不进引擎）。Concept 阶段可由 agent 直接驱动 MCP（`generate_screen_from_text` / `generate_variants`），官方 skills 经 `skills-lock` 锁版本引入。**MCP 尖锐边界须知**：生成是长任务且禁重试；写操作超时后先读后写对账，不得盲目重发。**官方 skill 准入映射**：
+
+| 官方 skill | 准入 | 理由 |
+|---|---|---|
+| `enhance-prompt` / `stitch::generate-design` | ✅ Concept / 原型阶段用 | 本职是出方向与屏幕 |
+| `stitch::manage-design-system` | ⚠️ 仅 Build 期辅助（上传项目 DESIGN.md 供 Stitch 消费） | SSOT 在仓库，Stitch 只当消费者 |
+| `design-md` / `taste-design` / `extract-design-md` / `stitch::react-components` 等 code 类 | ❌ 默认禁 | 从 Stitch 反向生成 DESIGN.md 违反「值须有参照出处」；screen→code 绕过原型闸 + design-lint + Critic |
 
 ## UI Prototype Gate（方案 A：静态原型，不依赖 OpenDesign）
 
