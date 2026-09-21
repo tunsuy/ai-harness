@@ -68,7 +68,7 @@ make design-lint        # Layer-1 设计门禁：硬编码值必须命中 docs/d
 | 域/任务 | [docs/harness/domains.yaml](docs/harness/domains.yaml) · [tasks.yaml](docs/harness/tasks.yaml) |
 | 进度 | [docs/harness/handoff.md](docs/harness/handoff.md) · `make wip-save` |
 | HOW | [docs/playbooks/](docs/playbooks/) |
-| Feature Brief / Accept / 原型 | [docs/features/](docs/features/) · skills `product-brief` / `product-accept` / `product-prototype` |
+| Feature Brief / Accept / 原型 | [docs/features/](docs/features/) · skills `product-brief` / `product-concept`（可选） / `product-accept` / `product-prototype` |
 | 设计 / 参照库 | [docs/design/](docs/design/) · [references/](docs/design/references/README.md) |
 | UI skill 包 | [skills-lock.json](skills-lock.json) · `make skills-ui` · [`.agents/skills/README.md`](.agents/skills/README.md) |
 | 产品流水线 | 引擎 PRODUCT_PIPELINE · 项目 `docs/product-pipeline.md` · `make check-ship` |

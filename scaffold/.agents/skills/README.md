@@ -7,6 +7,7 @@
 | skill | 用途 |
 |-------|------|
 | `product-brief` | Define |
+| `product-concept` | Concept Sketch（可选，Brief 后原型前的无约束发散） |
 | `product-accept` | Accept |
 | `product-prototype` | 方案 A 静态原型闸 |
 
@@ -27,6 +28,7 @@ make skills-ui
 - Emil：`animate` / `prototype` / `review-animations` / `improve-animations` / …
 - `impeccable`
 - `refactoring-ui`
+- Stitch 官方：`enhance-prompt` / `stitch::generate-design` / `stitch::manage-design-system`（需先配 Stitch MCP；**准入映射见引擎 PRODUCT_PIPELINE**——design-md / screen→code 类默认禁，不进本锁）
 
 更新某 skill：`npx skills update <name> -y`，再提交新的 `skills-lock.json`。
 
