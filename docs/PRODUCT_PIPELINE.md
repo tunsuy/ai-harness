@@ -35,7 +35,12 @@ Define ──► Design ──► Build ──► Accept ──► Learn
 
 > 适用：Brief 通过后、进原型闸**之前**，想先看「产品长什么样」的几个方向（信息架构 / 页面上有什么 / 密度与气质）。也可前移到 Brief 之前当纯想法生成用。**可选增强，不是任何闸的前置条件**（与 OpenDesign 同级待遇）。
 
-**定位：发散，不收敛。** Stitch（或任何 AI 概念生成工具）在**无约束**下天马行空出方向——不看 DESIGN.md、不碰 token、不跑 lint。约束下的收敛是原型闸的事，两件事不压在同一轮：方向没想清前，token 合规的原型画得再好也是白画。
+**粒度两档**（准入判断）：
+
+- **feature 级**：`docs/features/<id>/brief.md` 为 `approved`——为单个 feature 选形态。画的是该 feature 的页面。
+- **产品级**（整个产品先看形态）：`docs/prd.md` 方向已锁定即可（无须等任何 Brief）——为整个产品选信息架构。对象记为 `platform-ui`，产出隔离在 `docs/features/platform-ui/concept/`；画的是壳 + 核心列表页 + 主业务对象的全貌。
+
+**定位：发散，不收敛。** Stitch（或任何 AI 概念生成工具）在**无约束**下天马行空出方向——不看 DESIGN.md、不碰 token、不跑 lint。约束下的收敛是原型闸的事，两件事不压在同一轮：方向没想清前，token 合规的原型画得再好也是白画。**方向差异必须落在信息架构上**（导航结构 / 主视图是什么 / 业务对象如何呈现）；颜色气质差异不算方向。
 
 ```
 Brief approved ──► Concept Sketch（无约束发散，选方向）
@@ -47,8 +52,8 @@ Brief approved ──► Concept Sketch（无约束发散，选方向）
 
 三条边界：
 
-1. **产出隔离**：Stitch 产出只放 `docs/features/<id>/concept/`（或仅留链接，不进仓库）；**禁止**进 `prototype/`——整套原型纪律（design-lint / 组件覆盖检查 / Critic）不为它开豁免，也不适用（本来就没打算让它合规）。静态产出不是生产源，更不是规范来源。
-2. **人闸问的是产品形态**：这页面该有什么、不该有什么、信息架构对不对。**必答一句：「这上面有哪些东西是我的 Brief 没定义的？」** 概念工具会替你发明功能/字段/流程；被你喜欢的发明回流去改 Brief/AC，而不是顺着画下去——禁止视觉工具偷偷做产品决策。
+1. **产出隔离**：Stitch 产出只放 `docs/features/<id>/concept/`（产品级：`docs/features/platform-ui/concept/`；或仅留链接，不进仓库）；**禁止**进 `prototype/`——整套原型纪律（design-lint / 组件覆盖检查 / Critic）不为它开豁免，也不适用（本来就没打算让它合规）。静态产出不是生产源，更不是规范来源。
+2. **人闸问的是产品形态**：这页面该有什么、不该有什么、信息架构对不对。**必答一句：「这上面有哪些东西是我的准入文档（Brief / PRD）没定义的？」** 概念工具会替你发明功能/字段/流程；人闸对选中方向**逐条判定**——「回流准入文档」或「砍」，发明回流通去须记明（改 Brief/AC、平台壳导航清单等）；**未选中方向的发明不判**（概念稿作废存档）。禁止视觉工具偷偷做产品决策。
 3. **选中方向后进原型闸**：原型按项目 DESIGN.md 与 tokens **重做**，不临摹 Stitch 的值（色值/圆角/间距一概不回流）；方向参考记入 `prototype.md` 第 1 节。
 
 **执行方式（Stitch 官方 MCP + skills）**：Stitch 提供官方远程 MCP（`https://stitch.googleapis.com/mcp`，`X-Goog-Api-Key` 认证，key 在 stitch 设置页生成；属用户/项目一次性配置，不进引擎）。Concept 阶段可由 agent 直接驱动 MCP（`generate_screen_from_text` / `generate_variants`），官方 skills 经 `skills-lock` 锁版本引入。**MCP 尖锐边界须知**：生成是长任务且禁重试；写操作超时后先读后写对账，不得盲目重发。**官方 skill 准入映射**：
