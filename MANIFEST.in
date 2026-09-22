@@ -1,5 +1,6 @@
-include scaffold/**
+graft src/ai_harness/scaffold
 include docs/**
 include examples/**
 include LICENSE
 include README.md
+global-exclude __pycache__ *.py[cod] .DS_Store
