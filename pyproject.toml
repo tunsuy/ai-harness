@@ -22,4 +22,7 @@ ai-harness = "ai_harness.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-ai_harness = ["py.typed"]
+ai_harness = ["py.typed", "scaffold/**/*"]
+
+[tool.setuptools]
+include-package-data = true

@@ -67,12 +67,14 @@ TEXT_NAMES = {"Makefile.harness.mk", "GEMINI.md", "AGENTS.md"}
 
 def package_root() -> Path:
     here = Path(__file__).resolve().parent
-    cand = here.parents[1] / "scaffold"
+    # src layout (repo / editable install): src/ai_harness/scaffold
+    cand = here / "scaffold"
     if cand.is_dir():
-        return here.parents[1]
-    cand2 = here / "scaffold"
-    if cand2.is_dir():
         return here
+    # legacy repo layout: scaffold/ next to src/
+    cand2 = here.parents[1] / "scaffold"
+    if cand2.is_dir():
+        return here.parents[1]
     raise FileNotFoundError(
         "Cannot find scaffold/. Install from the ai-harness repo (pip install -e .)"
     )

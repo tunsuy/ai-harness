@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-HOOKS = ROOT / "scaffold" / ".cursor" / "hooks"
+HOOKS = ROOT / "src" / "ai_harness" / "scaffold" / ".cursor" / "hooks"
 sys.path.insert(0, str(HOOKS))
 
 from policy_lib import is_antigravity, is_codex  # noqa: E402
