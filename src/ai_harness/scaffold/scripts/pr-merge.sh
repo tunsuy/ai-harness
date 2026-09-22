@@ -8,7 +8,11 @@
 #   bash scripts/pr-merge.sh          # 当前分支对应 PR
 #
 # 环境:
-#   PR_MERGE_TIMEOUT_SEC  最长等待秒数（默认 900）
+#   PR_MERGE_TIMEOUT_SEC  最长等待秒数（默认 1800）
+#                          取值须 ≥ 项目最慢 PR CI job；最慢 job 超过默认值时勿靠反复
+#                          re-arm 硬扛——要么调大本值，要么把慢 job 后置到 main push（见
+#                          引擎 ADR-005 验证分层）。900 时代的实测教训：17min smoke 必超
+#                          900s，每次合入都要人工 re-arm，摩擦真实存在。
 #   PR_MERGE_INTERVAL_SEC 轮询间隔（默认 10）
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -23,7 +27,7 @@ if [ -z "$PR" ]; then
   exit 2
 fi
 
-TIMEOUT_SEC="${PR_MERGE_TIMEOUT_SEC:-900}"
+TIMEOUT_SEC="${PR_MERGE_TIMEOUT_SEC:-1800}"
 INTERVAL_SEC="${PR_MERGE_INTERVAL_SEC:-10}"
 deadline=$((SECONDS + TIMEOUT_SEC))
 

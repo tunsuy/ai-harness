@@ -424,7 +424,8 @@ def check_roadmap_tasks(task_ids: set[str]) -> list[str]:
     m = re.search(r"^## P0\b.*?\n(.*?)(?=^## |\Z)", text, re.S | re.M)
     p0 = roadmap_p0_task_ids()
     if not p0:
-        if m and "已全部交付" not in m.group(1):
+        # P0 全部交付是合法终态：占位行须含「已全部交付」标记（明细见 Shipped）
+        if not (m and "已全部交付" in m.group(1)):
             errs.append(
                 "roadmap P0 表未解析到任何 task_id"
                 "（须 `add-…` 反引号；全交付时用「已全部交付」占位行）"
@@ -667,7 +668,9 @@ def cmd_check_ship() -> int:
     ec = cmd_check()
     if ec != 0:
         return ec
-    tasks = load_yaml(TASKS).get("tasks") or {}
+    # 先跑完整 check（合入闸 ⊇ 日常门禁）
+    tsk = load_yaml(TASKS)
+    tasks = tsk.get("tasks") or {}
     errs = check_accept_pass(tasks)
     if errs:
         print("==> product ship gate FAIL")
