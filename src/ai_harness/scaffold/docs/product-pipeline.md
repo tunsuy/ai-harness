@@ -77,6 +77,23 @@ make check-harness
 
 「lint 绿 ≠ 完成」——行为以项目 smoke 为准。
 
+## 验证分层（ADR-005；项目填写具体口径）
+
+开发期反馈与准出验证分三层，**预览快、门禁严，两层不混**：
+
+| 层 | 位置 | 项目填写（例） |
+|----|------|----------------|
+| L0 预览 | 本机 | dev server / HMR / 单元测试 / 定向脚本（秒级） |
+| L1 PR | CI pull_request | 静态 check + 单元测试 + 约定检查（~2min） |
+| L2 兜底 | CI push main | **全量行为 smoke**（合入点即发布点；挂了走立即修复流程） |
+
+- PR 层**不跑**全量行为 smoke；合入前的行为验证靠**本地 Accept 准出**（含项目 smoke，不缩水）
+- main smoke 挂了：修复 PR → 合入 → main 全量复验绿（流程写项目 playbook）
+- 开发期「改页面看效果」走预览层（如 `web-dev` 类幂等起栈 + dev server 目标）；准出走全量 check——禁止把预览混进门禁
+- `pr-merge` 超时 ≥ 项目最慢 PR job（默认 1800s；最慢 job 是分钟级冒烟时，按本分层把它后置到 main，不要反复 re-arm）
+
+已验证案例：TokenStore ci-smoke-tiering（2026-09-22，PR 反馈 18min → 1m42s；main 全量 397/0 兜底）。
+
 ## DoR（进 Build）
 
 除通用 DoR 外，本项目额外：

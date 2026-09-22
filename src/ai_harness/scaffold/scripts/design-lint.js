@@ -21,6 +21,16 @@
  *     font-sizes-extra: [28, ...]        typography 之外的正文字号阶梯补充
  *     baseline:                          已知历史漂移（Build 折回后必须删除）
  *       - "相对路径 | 匹配子串 | 说明"
+ *     semantic-paths: ["apps/web/src/features/"]  语义层扫描范围（路径子串；不配 = 语义层不扫）
+ *     semantic-exempt: ["features/x"]    语义层豁免路径子串（存量漂移，折回后必须删除条目）
+ *
+ * 语义层规则（error 级；opt-in——配了 semantic-paths 才扫，命中路径子串的 .tsx）：
+ *   [SEMANTIC-BOLD]    行内不加粗：行内 font-medium/semibold/bold 即 error（正文 400 只此一档）；
+ *                      白名单 = 含 <h2 的行（区块标题）与 chip 形态行
+ *                      （rounded-{sm|md|full} + text-xs/[11px]/[13px] 同现）。
+ *   [SEMANTIC-CAPTION] 口径 caption 在位：文件使用 <Table 则必须含 ts-caption（表格页口径说明）。
+ *   组件库/壳是规格 SSOT 不属页面语义层——用 semantic-paths 圈定 features 页面树即可。
+ *   （TokenStore 页面语法沉淀的两条默认实现；覆盖行内字重与表格口径两个高频翻车点。）
  *
  * 结构性 rgba 恒定放行：rgba(255,255,255,*)（内高光）/ rgba(0,0,0,*)（遮罩）。
  * 全圆场景豁免圆角档位：9999px / 50% / rounded-full / avatar / dot / circle 上下文。
@@ -102,11 +112,15 @@ function parseTokens(designPath) {
   const fontWeights = [...new Set((fm.match(/fontWeight:\s*(\d+)/g) || []).map(s => parseInt(s.replace(/\D/g, ''), 10)))];
 
   // lint: 配置块
-  const lint = { targets: [], heights: null, baseline: [] };
+  const lint = { targets: [], heights: null, baseline: [], semanticPaths: null, semanticExempt: [] };
   const tM = lintBlock.match(/targets:\s*\[([^\]]*)\]/);
   if (tM) lint.targets = parseFlowList('[' + tM[1] + ']');
   const hM = lintBlock.match(/heights:\s*\[([^\]]*)\]/);
   if (hM) lint.heights = parseFlowList('[' + hM[1] + ']').map(Number).filter(n => !isNaN(n));
+  const semP = lintBlock.match(/semantic-paths:\s*\[([^\]]*)\]/);
+  if (semP) lint.semanticPaths = parseFlowList('[' + semP[1] + ']');
+  const semEx = lintBlock.match(/semantic-exempt:\s*\[([^\]]*)\]/);
+  if (semEx) lint.semanticExempt = parseFlowList('[' + semEx[1] + ']');
   const seM = lintBlock.match(/spacing-extra:\s*\[([^\]]*)\]/);
   if (seM) spacing.push(...parseFlowList('[' + seM[1] + ']').map(Number).filter(n => !isNaN(n)));
   const feM = lintBlock.match(/font-sizes-extra:\s*\[([^\]]*)\]/);
@@ -136,7 +150,9 @@ function extractColors(content) {
 }
 
 function extractNumbers(content, property) {
-  const regex = new RegExp(`${property}:\\s*([\\d.]+)(px|rem|em)?`, 'g');
+  // (?<![\w-]) 排除复合属性前缀（line-height / min-height 误命中 height 档位表；
+  // 控件档位升级时 .ts-page-title 的 line-height 触发误报即此缺陷）
+  const regex = new RegExp(`(?<![\\w-])${property}:\\s*([\\d.]+)(px|rem|em)?`, 'g');
   const matches = [];
   let m;
   while ((m = regex.exec(content)) !== null) {
@@ -225,6 +241,29 @@ function checkFile(filePath, tokens) {
       if (!tokens.fontWeights.includes(value)) {
         errors.push(`[FONT-WEIGHT] ${filePath}: 字重 ${value} 不在档位表 [${tokens.fontWeights.sort((a, b) => a - b)}] 中`);
       }
+    }
+  }
+
+  // 8. 语义层规则（error 级；opt-in——lint.semantic-paths 圈定的页面树才扫；
+  //    组件/壳规格 SSOT 不在范围。semantic-exempt 路径子串豁免存量漂移，折回后须删条目）
+  const semPaths = tokens.lint.semanticPaths;
+  const inSemScope = !!semPaths && filePath.endsWith('.tsx') && semPaths.some((x) => filePath.includes(x));
+  const semExempt = inSemScope && tokens.lint.semanticExempt.some((x) => filePath.includes(x));
+  if (inSemScope && !semExempt) {
+    const lines = content.split(/\r?\n/);
+    lines.forEach((line, idx) => {
+      if (!/\bfont-(?:medium|semibold|bold)\b/.test(line)) return;
+      if (line.includes('<h2')) return; // 区块标题白名单
+      // chip 形态白名单：小圆角/全圆 + 小字号同现（徽章/标签本体）
+      if (/rounded-(?:sm|md|full)/.test(line) && /text-(?:xs|\[1[13]px\])/.test(line)) return;
+      errors.push(
+        `[SEMANTIC-BOLD] ${filePath}:${idx + 1}: 行内加粗 font-medium/semibold/bold——正文 400 只此一档（白名单 = chip + h2）`,
+      );
+    });
+    if (content.includes('<Table') && !content.includes('ts-caption')) {
+      errors.push(
+        `[SEMANTIC-CAPTION] ${filePath}: 使用 <Table 但缺口径 caption（ts-caption）——表格页必带口径说明`,
+      );
     }
   }
 

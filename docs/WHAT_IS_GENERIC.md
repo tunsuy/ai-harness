@@ -19,7 +19,8 @@
 | UI 原型模板 | `_TEMPLATE/prototype.md`（含两段式 Critic 评审节 + 送闸前自查清单 + Concept 方向来源行）+ `_accept-checklist.md` 骨架 |
 | Concept Sketch（可选概念工具） | 引擎 `PRODUCT_PIPELINE.md` 一节：Stitch 等无约束出方向，产出隔离在项目 `docs/features/<id>/concept/`，人闸选产品形态；原型闸内 token 重做；含官方 skill 准入映射（✅ 生成类 / ⚠️ 设计系统仅 Build 期辅助 / ❌ 反向 DESIGN.md 与 screen→code 类） |
 | 设计参照库 | `docs/design/references/`（取法 + stripe/vercel/posthog 样例 + `cn-design-systems/` 中文三家 token 级对照）；项目 `DESIGN.md` 骨架 |
-| Layer-1 设计门禁 | scaffold `scripts/design-lint.js`（token 表自动解析自项目 DESIGN.md front matter，零依赖）+ `make design-lint`；含 `lint.baseline` 已知漂移基线机制（折回后必须删条目）；三层门禁架构见 `PRODUCT_PIPELINE.md` |
+| Layer-1 设计门禁 | scaffold `scripts/design-lint.js`（token 表自动解析自项目 DESIGN.md front matter，零依赖）+ `make design-lint`；含 `lint.baseline` 已知漂移基线机制（折回后必须删条目）；**语义层规则 opt-in**（`lint.semantic-paths` 圈定页面树才扫：行内不加粗 SEMANTIC-BOLD / 表格口径 caption SEMANTIC-CAPTION；`semantic-exempt` 存量漂移豁免）；三层门禁架构见 `PRODUCT_PIPELINE.md` |
+| 验证分层方法论 | **ADR-005**：预览（L0 dev server/HMR）/ PR（L1 静态+单测）/ main（L2 全量 smoke 兜底）三层，「预览快、门禁严，两层不混」；行为冒烟只挂 main push（合入点即发布点），本地 Accept 准出不缩水，main 挂了走立即修复；pr-merge 超时 ≥ 最慢 PR job（默认 1800s）；管线骨架见 scaffold `product-pipeline.md`「验证分层」节 |
 | 质量锚方法论 | scaffold `DESIGN.md` 骨架「质量锚」默认八条 + 两段式（观感先于核对）说明；锚条目项目可增删改 |
 | 可配置禁写 | `docs/harness/policy.yaml` |
 | Make 目标 | `Makefile.harness.mk`（含 `check-ship` / `pr-merge`） |
