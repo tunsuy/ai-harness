@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ai_harness.scaffold_io import (
     PROTECT,
+    detect_project_name,
     ensure_makefile_include,
     is_engine_path,
     iter_scaffold_files,
@@ -21,8 +22,12 @@ def run_upgrade(*, target: str, dry_run: bool = False) -> int:
         return 2
 
     src = scaffold_dir()
-    # Upgrade copies scaffold bytes as-is (no {{PROJECT_*}} substitution) so
-    # diffs are stable and project fill is never rewritten via templates.
+    # Engine files carry {{PROJECT_*}} placeholders; upgrade recovers the
+    # project's name from existing fill (AGENTS.md heading / dir name) so
+    # substitution matches what init produced, never regressing it to the
+    # literal placeholder.
+    project = detect_project_name(dest)
+    mapping = {"PROJECT_NAME": project}
 
     updated: list[str] = []
     added: list[str] = []
@@ -48,7 +53,7 @@ def run_upgrade(*, target: str, dry_run: bool = False) -> int:
             continue
 
         existed = out.exists()
-        write_scaffold_file(path, out, mapping={})
+        write_scaffold_file(path, out, mapping=mapping)
         (updated if existed else added).append(rel)
 
     mk_note: str | None = None

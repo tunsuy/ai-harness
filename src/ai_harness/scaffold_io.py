@@ -1,6 +1,7 @@
 """Shared scaffold path helpers for init / upgrade."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 # Project fill — never overwrite on init --force or upgrade
@@ -12,9 +13,11 @@ PROTECT = frozenset(
         "docs/harness/policy.yaml",
         "docs/harness/tasks.yaml",
         "docs/design/DESIGN.md",
+        "docs/design/references.md",  # 按仓定制「取什么/不取什么」
         "docs/product-pipeline.md",
         "docs/architecture.md",
         "docs/glossary.md",
+        "skills-lock.json",  # 安装时点快照，各项目自己的锁
         "AGENTS.md",
         "GEMINI.md",
     }
@@ -24,13 +27,11 @@ PROTECT = frozenset(
 ENGINE_EXACT = frozenset(
     {
         "Makefile.harness.mk",
-        "skills-lock.json",
         "docs/harness/README.md",
         "docs/harness/handoff.template.md",
         "docs/features/README.md",
         "docs/features/_accept-checklist.md",
         "docs/design/README.md",
-        "docs/design/references.md",
         "docs/decisions/README.md",
     }
 )
@@ -152,3 +153,31 @@ def ensure_makefile_include(dest: Path, project: str) -> str | None:
         return None
     mk.write_text(f"# {project}\n\ninclude Makefile.harness.mk\n", encoding="utf-8")
     return "Makefile"
+
+
+def detect_project_name(dest: Path) -> str:
+    """Detect the project's name for {{PROJECT_NAME}} substitution on upgrade.
+
+    Reads the first heading of AGENTS.md (``# AGENTS.md — <Name> …`` or
+    ``# <Name> …``); falls back to the directory name. init-time substitution
+    uses the --name flag; upgrade has no flag, so it recovers the name from
+    existing project fill.
+    """
+    agents = dest / "AGENTS.md"
+    if agents.is_file():
+        try:
+            lines = agents.read_text(encoding="utf-8").splitlines()
+        except UnicodeDecodeError:
+            lines = []
+        for line in lines:
+            s = line.strip()
+            if not s.startswith("# "):
+                continue
+            body = s[2:].strip()
+            m = re.match(r"^AGENTS\.md\s*[—–-]\s*(\S+)", body, re.IGNORECASE)
+            if m:
+                return m.group(1).rstrip("：:（(")
+            if body:
+                return body.split()[0].rstrip("：:—-（(")
+            break
+    return dest.name
