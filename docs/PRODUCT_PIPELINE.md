@@ -52,7 +52,7 @@ Brief approved ──► Concept Sketch（无约束发散，选方向）
 
 三条边界：
 
-1. **产出隔离**：Stitch 产出只放 `docs/features/<id>/concept/`（产品级：`docs/features/platform-ui/concept/`；或仅留链接，不进仓库）；**禁止**进 `prototype/`——整套原型纪律（design-lint / 组件覆盖检查 / Critic）不为它开豁免，也不适用（本来就没打算让它合规）。静态产出不是生产源，更不是规范来源。
+1. **产出隔离**：Stitch 产出只放 `docs/features/<id>/concept/`（产品级：`docs/features/platform-ui/concept/`；或仅留链接，不进仓库）；**禁止**进 `prototype/`——整套原型纪律（design-lint / 组件覆盖检查）不为它开豁免，也不适用（本来就没打算让它合规）。静态产出不是生产源，更不是规范来源。
 2. **人闸问的是产品形态**：这页面该有什么、不该有什么、信息架构对不对。**必答一句：「这上面有哪些东西是我的准入文档（Brief / PRD）没定义的？」** 概念工具会替你发明功能/字段/流程；人闸对选中方向**逐条判定**——「回流准入文档」或「砍」，发明回流通去须记明（改 Brief/AC、平台壳导航清单等）；**未选中方向的发明不判**（概念稿作废存档）。禁止视觉工具偷偷做产品决策。
 3. **选中方向后进原型闸**：原型按项目 DESIGN.md 与 tokens **重做**，不临摹 Stitch 的值（色值/圆角/间距一概不回流）；方向参考记入 `prototype.md` 第 1 节。
 
@@ -62,7 +62,7 @@ Brief approved ──► Concept Sketch（无约束发散，选方向）
 |---|---|---|
 | `enhance-prompt` / `stitch::generate-design` | ✅ Concept / 原型阶段用 | 本职是出方向与屏幕 |
 | `stitch::manage-design-system` | ⚠️ 仅 Build 期辅助（上传项目 DESIGN.md 供 Stitch 消费） | SSOT 在仓库，Stitch 只当消费者 |
-| `design-md` / `taste-design` / `extract-design-md` / `stitch::react-components` 等 code 类 | ❌ 默认禁 | 从 Stitch 反向生成 DESIGN.md 违反「值须有参照出处」；screen→code 绕过原型闸 + design-lint + Critic |
+| `design-md` / `taste-design` / `extract-design-md` / `stitch::react-components` 等 code 类 | ❌ 默认禁 | 从 Stitch 反向生成 DESIGN.md 违反「值须有参照出处」；screen→code 绕过原型闸 + design-lint |
 
 ## UI Prototype Gate（方案 A：静态原型，不依赖 OpenDesign）
 
@@ -74,26 +74,26 @@ Brief approved ──► Concept Sketch（无约束发散，选方向）
 1. Brief = `approved` 后进入 Design。
 2. Agent 只写 `docs/features/<id>/prototype/` 下的**自包含静态 HTML**（可多变体 `v1/` `v2/`），**不改** `apps/` / `packages/` / `services/` 等实现树。
 3. **组件覆盖检查**（每轮开画前）：列出本页用到的全部组件（按钮 / 输入框 / 选择器 / 复选框 / 弹窗 / 徽章 / 表格 / …），逐个对项目 `DESIGN.md` 找规范行——**任何没有规范行的组件，必须先补规范再画**：值从 `docs/design/references/` 对照得出、写进 DESIGN.md，并在 prototype.md 记「本轮补规范」清单。禁止先画再等人闸纠正（TokenStore keys v4 教训：控件高度 34px 系临场拍值，SSOT 从未定义，人闸被迫当第一道规范审）。已过覆盖检查的组件后续页面直接继承，不再逐页仲裁。
-4. 每版写完必过 **Layer 1 设计门禁**：`node scripts/design-lint.js docs/features/<id>/prototype/vN`——表外硬编码色值 / 圆角 / 字号 / 字重 = error，清零才进自评；高度 / 间距 / rgba = warning，逐条确认有 SSOT 依据。lint 与设计决策冲突时**先改 DESIGN.md（走参照对照 + 记录）再改原型**；禁止为过闸临场拍值、禁止往 token 表塞无出处的值。
-5. **送人闸前自评（两段式，顺序不可换）**：① 先以「第一次打开页面的用户」身份看三档截图（1440 / 1024 / 375，full-page），记录所有不适感（间距 / 密度 / 字重 / 层级 / 对齐）并修掉；② 再按 DESIGN.md「质量锚」逐条自查（过 / 不过 + 定位到行）。观感先于核对，防止锚把眼睛框住。**禁止把第一稿直接发给人闸。**
-6. Critic 评审（见「Agent 角色约定」）→ 发布可点开的 HTTPS（或内网）预览链接 → 更新 `docs/features/<id>/prototype.md`（状态 `pending`）。
+4. 每版写完必过 **Layer 1 设计门禁**：`node scripts/design-lint.js docs/features/<id>/prototype/vN`——表外硬编码色值 / 圆角 / 字号 / 字重 = error，清零才送闸；高度 / 间距 / rgba = warning，逐条确认有 SSOT 依据。lint 与设计决策冲突时**先改 DESIGN.md（走参照对照 + 记录）再改原型**；禁止为过闸临场拍值、禁止往 token 表塞无出处的值。
+5. ~~送人闸前两段式自评 / fresh-session Critic~~ **已按 ADR-006 移除**（2026-09-24，agentory 实测：免 Critic 照走通质量未降；第一眼质量兜底 = design-lint 机械闸 + 人闸肉眼）。**工作流不产截图**（ADR-006）：agent 不拍图不贴图不看图，人想看打开预览链接。
+6. 发布可点开的 HTTPS（或内网）预览链接 → 更新 `docs/features/<id>/prototype.md`（状态 `pending`）。
 7. 人确认变体（微信口令：`确认 A` / `确认 B` / `改：…` / `重出`）→ `prototype.md` 标 `confirmed` + 选中变体。
-8. 再进 Build：按项目 UI 规范与 tokens **重做进生产组件**；静态原型不是生产源。
+8. 再进 Build：按项目 UI 规范与 tokens **重做进生产组件**；静态原型不是生产源。Build 期不要求配套浏览器 E2E suite（ADR-006：行为验证归 ADR-005 分层——开发期走 L0 预览 + 工程门禁，全量回归兜底归 L2 main；「缺 suite」不构成返工项）。
 
 模板：`scaffold/docs/features/_TEMPLATE/prototype.md`（项目可镜像到 `docs/features/_TEMPLATE/`）。
 
 OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**。
 
-### 工序分级（防一刀切满配）
+### 工序分级（防一刀切满配；ADR-006 后自评/Critic 列已删）
 
-上述 1–8 是满配工序，为「门面级新页」设计；**其余改动按下表减配**，agent 不得对低级改动擅自跑满配（截图三档 / Critic / 多变体都是成本）：
+上述 1–8 为门面级新页的满配工序；**其余改动按下表减配**，agent 不得对低级改动擅自跑满配（多变体是成本）：
 
-| 改动类型 | 组件检查 | design-lint | 截图自评 | Critic | 变体数 |
-|----------|---------|------------|---------|--------|--------|
-| 门面级新页 / 整页重做首轮 | ✅ | ✅ | ✅ 三档（1440/1024/375） | ✅ fresh-session | ≥2（概念轮已发散则 1） |
-| 普通新页（已知组件组合、无新布局语法） | ✅ | ✅ | ✅ 一档（目标断点） | ❌ | 1 |
-| 已有页局部改（区块增删、组件内布局） | 按需（用到新组件才查） | ✅ | ✅ 一档 | ❌ | 1 |
-| 文案 / 色值 / 间距微调（不动布局） | ❌ | ✅ | ❌ | ❌ | exempt（跳过整轮原型，prototype.md 写理由） |
+| 改动类型 | 组件检查 | design-lint | 变体数 |
+|----------|---------|------------|--------|
+| 门面级新页 / 整页重做首轮 | ✅ | ✅ | ≥2（概念轮已发散则 1） |
+| 普通新页（已知组件组合、无新布局语法） | ✅ | ✅ | 1 |
+| 已有页局部改（区块增删、组件内布局） | 按需（用到新组件才查） | ✅ | 1 |
+| 文案 / 色值 / 间距微调（不动布局） | ❌ | ✅ | exempt（跳过整轮原型，prototype.md 写理由） |
 
 **不可省的底线**（分级不减配）：
 
@@ -138,7 +138,7 @@ OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**�
 ## Definition of Done（准出 / Ship）
 
 - [ ] 工程：项目约定的 check / lint / test / smoke 绿
-- [ ] 产品：`accept.md` 对每条 AC 有证据（命令、截图路径、日志摘要）
+- [ ] 产品：`accept.md` 对每条 AC 有证据（命令、路径、日志摘要；不产截图——ADR-006，取证 = 命令输出 / API 直打 / 单测 / 亲测记录）
 - [ ] Accept verdict = `PASS`
 - [ ] S 层：人感 / 业务勾选完成
 - [ ] 文档：roadmap / handoff / glossary 该改的已改
@@ -150,12 +150,12 @@ OpenDesign 等外部设计工具为可选增强，**不是本闸前置条件**�
 |------|--------|----------|
 | **Brief** | 新 feature / 大改范围 | 只写 `docs/features/**`；可读定位/roadmap/ADR |
 | **Architect** | DoR 中需 ADR 或跨域方案 | 写 ADR / task / playbook；不写业务实现 |
-| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；**开画前组件覆盖检查**（无规范行的组件先补规范）；**每版必过 `design-lint`**（Layer 1，error 清零）；**送闸前两段式自评**；按需用 `docs/design/references/` 选老师并记入 prototype；等人确认 |
-| **Critic** | 所有送人闸的原型，送闸前 | **fresh-session**（不与出稿者共用上下文），**两段式、顺序不可换**：先「第一眼观感」（只看三档截图/预览链接，记录不适感，禁止先读锚；**出报告前逐条回源核实**——对照 HTML 源码/复查截图确认元素存在，找不到源的可疑条目剔除，观感只采信已核实条目）→ 再「质量锚核对」（变体 + DESIGN 质量锚 + 参照记录，逐条打分 + 排序 + 最大风险一句）；写 `prototype.md`「评审」节；**不改 HTML、不做顺手修**。复用既有页模板只豁免双变体要求，不豁免 Critic |
+| **UI Prototype** | Design 阶段有界面 | 只写 `docs/features/<id>/prototype/**` + `prototype.md`；挂项目 DESIGN；**开画前组件覆盖检查**（无规范行的组件先补规范）；**每版必过 `design-lint`**（Layer 1，error 清零）；按需用 `docs/design/references/` 选老师并记入 prototype；发预览链接等人确认。~~两段式自评 / Critic~~ 已按 ADR-006 移除；不拍截图 |
+| ~~**Critic**~~ | ~~所有送人闸的原型，送闸前~~ | **已按 ADR-006 移除**（fresh-session 评审为纯开销：第一眼质量兜底 = design-lint 机械闸 + 人闸肉眼；agentory 实测免 Critic 照走通质量未降）。项目坚持要评审的，自行在项目附录加回并记 ADR |
 | **Builder** | Brief=`approved`、原型已确认（或豁免）、且 DoR 齐 | 现有 playbook；不改 AC；按确认变体落地 |
 | **Accept** | Build 自检完成 | 只读 + 跑验证；写 `accept.md`；不改产品代码 |
 
-独立会话优于同一会话「扮演多个角色」。Accept 不得与 Builder 共用未清上下文的长会话；Critic 同理，不得与 UI Prototype 共用。
+独立会话优于同一会话「扮演多个角色」。Accept 不得与 Builder 共用未清上下文的长会话。
 
 ## 与工程 harness 的关系
 
@@ -204,5 +204,5 @@ brief_exempt: true          # 微改 / 流水线前存量 playbook
 
 - 不照搬大厂 10 人评审会 / 专职 QA 编制
 - 不计费 / 账本类产品不当 Research Preview「先发后补」
-- 不一上来造 10+ agent；OPC 默认 Brief + Accept，Architect / Critic 按痛点加
+- 不一上来造 10+ agent；OPC 默认 Brief + Accept，Architect 按痛点加
 - 不在 Write hook 里拦每一文件（成本高）；靠 `make check-harness` / `pr-merge` 与 ADR 闸同级失败

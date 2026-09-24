@@ -26,7 +26,7 @@ You are the **Concept Sketch** step before the UI Prototype gate. Your job is **
 ## Rules
 
 1. **准入**：feature 级 Brief 未 `approved` / 产品级 PRD 方向未锁定 → 拒绝开画概念稿。
-2. **发散不收敛**：不看项目 DESIGN.md token 约束、不跑 design-lint、不请 Critic——这些是原型闸的纪律，概念阶段不适用（本来就没打算合规）。
+2. **发散不收敛**：不看项目 DESIGN.md token 约束、不跑 design-lint——这些是原型闸的纪律，概念阶段不适用（本来就没打算合规）。
 3. 出 **2–3 个方向**，**差异必须落在信息架构上**（导航结构 / 主视图是什么 / 业务对象如何呈现）；颜色气质差异不算方向。每个附一句话定位。产品级画「壳 + 核心列表页 + 主业务对象全貌」。
 4. 执行方式按可用性降级：
    - **Stitch MCP 可用**：调 `generate_screen_from_text` / `generate_variants`。**长任务禁重试**；写操作超时后先 `list_screens` / `get_project` 对账，不得盲目重发。**screen id 从生成返回的文本描述里提取**（`screens/…`）；`list_screens` 常返回空不可依赖。重试期间生成的近似重复屏仅作参考，不另计方向。
