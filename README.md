@@ -23,6 +23,8 @@ python3 -m ai_harness init --name MyApp
 # 已有项目对齐新版引擎（只刷引擎文件，不碰业务填充）
 ai-harness upgrade
 ai-harness upgrade --dry-run   # 只看会改什么
+# skills-lock.json 快进：无本地改动的项目锁自动对齐引擎锁（新 skill 随升级下发）；
+# `npx skills update` 过的锁视为已漂移，不动并提示手动合并
 ```
 
 然后：

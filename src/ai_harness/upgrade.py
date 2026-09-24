@@ -10,6 +10,7 @@ from ai_harness.scaffold_io import (
     ensure_makefile_include,
     is_engine_path,
     iter_scaffold_files,
+    lock_is_fast_forward,
     scaffold_dir,
     write_scaffold_file,
 )
@@ -32,11 +33,23 @@ def run_upgrade(*, target: str, dry_run: bool = False) -> int:
     updated: list[str] = []
     added: list[str] = []
     unchanged: list[str] = []
+    lock_ff: list[str] = []
     protected_hint: list[str] = []
 
     for path, rel in iter_scaffold_files(src):
         if rel in PROTECT:
             out = dest / rel
+            if rel == "skills-lock.json":
+                # 升级特例：无本地漂移的项目锁可快进到引擎锁（见 lock_is_fast_forward）
+                if out.is_file() and path.is_file() and filecmp.cmp(path, out, shallow=False):
+                    unchanged.append(rel)
+                elif lock_is_fast_forward(out, path):
+                    if not dry_run:
+                        write_scaffold_file(path, out, mapping=mapping)
+                    lock_ff.append(rel)
+                elif out.is_file():
+                    protected_hint.append(rel)
+                continue
             if out.is_file() and path.is_file() and not filecmp.cmp(path, out, shallow=False):
                 protected_hint.append(rel)
             continue
@@ -67,6 +80,7 @@ def run_upgrade(*, target: str, dry_run: bool = False) -> int:
     print(f"  updated:   {len(updated)}")
     print(f"  added:     {len(added)}")
     print(f"  unchanged: {len(unchanged)}")
+    print(f"  lock ff:   {len(lock_ff)}")
     for title, items in (("updated", updated), ("added", added)):
         if not items:
             continue
@@ -75,6 +89,11 @@ def run_upgrade(*, target: str, dry_run: bool = False) -> int:
             print(f"    - {s}")
         if len(items) > 20:
             print(f"    … +{len(items) - 20} more")
+
+    if lock_ff:
+        print("  — fast-forwarded (engine skills merged in; no local lock edits detected):")
+        for s in lock_ff:
+            print(f"    - {s}")
 
     if protected_hint:
         print()
@@ -89,6 +108,8 @@ def run_upgrade(*, target: str, dry_run: bool = False) -> int:
     print()
     print("Engine only. Never touches: domains.yaml / invariants.md / handoff.md /")
     print("  policy.yaml / tasks.yaml / DESIGN.md / product-pipeline.md / AGENTS.md …")
+    print("skills-lock.json: fast-forwarded only if it is an unmodified subset of the")
+    print("  engine lock; a locally updated lock (npx skills update) is kept + hinted.")
     if dry_run:
         print("Re-run without --dry-run to apply.")
     else:
