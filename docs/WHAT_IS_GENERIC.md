@@ -9,7 +9,7 @@
 | 会话交接 + git WIP | `handoff.md` + `handoff.sh` + `wip-save.sh` |
 | Agent 硬拦适配 | `policy_lib` + Cursor/Claude/Codex/Antigravity hooks（含 repo-root 解析） |
 | 产品流水线 skills | `.agents/skills/` + `.claude/skills/`：`product-brief` / `product-accept` / `product-prototype` |
-| UI skill 推荐包 | scaffold `skills-lock.json` + `make skills-ui`（`npx skills experimental_install`）；不整包 vendoring。含 Stitch 官方 skills（`enhance-prompt` / `stitch::generate-design` / `stitch::manage-design-system`，准入映射见 PRODUCT_PIPELINE） |
+| UI skill 推荐包 | scaffold `skills-lock.json` + `make skills-ui`（`npx skills experimental_install`）；不整包 vendoring。含 Stitch 官方 skills（`enhance-prompt` / `stitch::generate-design` / `stitch::manage-design-system`，准入映射见 PRODUCT_PIPELINE）。upgrade 时无本地改动的项目锁自动快进到引擎锁；`npx skills update` 过的锁视为已漂移，不覆盖、提示手动合并 |
 | Stitch MCP 接入 | 文档指引（端点 / 认证头）+ 准入纪律；凭证与 MCP 注册属项目/用户配置，引擎不含 |
 | 冷启动 Always-On | `.cursor/rules` + `.agents/rules`（含默认 `pr-merge`） |
 | 失败回流 | playbook `harness-feedback.md` |

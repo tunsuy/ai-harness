@@ -1,6 +1,7 @@
 """Shared scaffold path helpers for init / upgrade."""
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -17,7 +18,7 @@ PROTECT = frozenset(
         "docs/product-pipeline.md",
         "docs/architecture.md",
         "docs/glossary.md",
-        "skills-lock.json",  # 安装时点快照，各项目自己的锁
+        "skills-lock.json",  # init --force 不覆盖；upgrade 时无本地漂移可快进（见 lock_is_fast_forward）
         "AGENTS.md",
         "GEMINI.md",
     }
@@ -95,6 +96,42 @@ def is_engine_path(rel: str) -> bool:
     if rel in ENGINE_EXACT:
         return True
     return any(rel == p.rstrip("/") or rel.startswith(p) for p in ENGINE_PREFIXES)
+
+
+def lock_is_fast_forward(project_lock: Path, engine_lock: Path) -> bool:
+    """skills-lock.json 可否在 upgrade 时安全快进到引擎锁。
+
+    项目锁是引擎锁的「无漂移子集」才快进：version 一致，且每个条目在
+    引擎锁中同名整条相等（含 computedHash / source / skillPath）。项目
+    锁缺失视为空子集（可直接写入引擎锁）。任一 JSON 解析失败 / version
+    不同 / 项目有引擎没有的条目 / 共有条目不同 → False（按 PROTECT 提示手动合并）。
+    """
+    try:
+        engine = json.loads(engine_lock.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if not isinstance(engine, dict):
+        return False
+
+    if not project_lock.is_file():
+        project = {"version": engine.get("version"), "skills": {}}
+    else:
+        try:
+            project = json.loads(project_lock.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return False
+        if not isinstance(project, dict):
+            return False
+
+    if project.get("version") != engine.get("version"):
+        return False
+
+    eng_skills = engine.get("skills") or {}
+    prj_skills = project.get("skills") or {}
+    if not isinstance(eng_skills, dict) or not isinstance(prj_skills, dict):
+        return False
+
+    return all(eng_skills.get(name) == entry for name, entry in prj_skills.items())
 
 
 def substitute(text: str, mapping: dict[str, str]) -> str:

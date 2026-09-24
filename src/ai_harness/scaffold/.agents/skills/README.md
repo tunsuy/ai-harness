@@ -30,7 +30,7 @@ make skills-ui
 - `refactoring-ui`
 - Stitch 官方：`enhance-prompt` / `stitch::generate-design` / `stitch::manage-design-system`（需先配 Stitch MCP；**准入映射见引擎 PRODUCT_PIPELINE**——design-md / screen→code 类默认禁，不进本锁）
 
-更新某 skill：`npx skills update <name> -y`，再提交新的 `skills-lock.json`。
+更新某 skill：`npx skills update <name> -y`，再提交新的 `skills-lock.json`。之后 `ai-harness upgrade` 会视项目锁为已漂移，不自动快进（提示手动合并）。
 
 ## 不要做的事
 
