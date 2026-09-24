@@ -22,15 +22,16 @@ define-feature → UI 原型确认（若有界面）→（ADR 若需要）→ �
 
 **不部署 OpenDesign。** Agent 按本仓设计规范写出静态 HTML，发预览链接，人确认后再 Build。
 
-每轮流程（完整版见引擎 `docs/PRODUCT_PIPELINE.md`「UI Prototype Gate」）：
+每轮流程（完整版见引擎 `docs/PRODUCT_PIPELINE.md`「UI Prototype Gate」；ADR-006 后自评/Critic 已移除、不产截图）：
 
 ```
-组件覆盖检查 → 画变体 → design-lint 每版过闸 → 两段式自评 → Critic（fresh-session） → 预览链接送人闸
+组件覆盖检查 → 画变体 → design-lint 每版过闸 → 预览链接送人闸
 ```
 
 - **组件覆盖检查**：本页用到的每个组件在项目 `DESIGN.md` 必须有规范行；没有的先补规范（值从参照库对照得出）再画，禁止临场拍值等人闸纠正。
 - **design-lint（Layer 1 机械门禁）**：`make design-lint DESIGN_LINT_TARGETS="docs/features/<id>/prototype/vN"`——表外色值/圆角/字号/字重 = error 必须清零；warning 逐条确认有 SSOT 依据。冲突时先改 DESIGN.md 再改原型。
-- **两段式自评**：先以第一次打开页面的用户身份看三档截图（1440/1024/375）修掉不适感，再按 DESIGN.md「质量锚」逐条自查。禁止第一稿直接送人闸。
+- **两段式自评与 fresh-session Critic 已移除**（ADR-006，2026-09-24）：第一眼质量由 design-lint 机械闸 + 人闸肉眼把关兜底；agent 不对任何级别改动派 Critic 或跑截图自评工序，不拍图不贴图（人想看打开预览链接）。
+- **Build 期不要求配套浏览器 E2E suite**（ADR-006）：行为验证按 ADR-005 分层——开发期走 L0 预览 + 工程门禁，全量回归兜底归 L2 main；「缺 suite」不构成返工项。若项目建 E2E 库，保留为 main 回归兜底资产。
 
 ### 设计参照（每轮原型建议）
 
@@ -40,7 +41,7 @@ define-feature → UI 原型确认（若有界面）→（ADR 若需要）→ �
 
 - 必须：新页、改壳/信息架构、明显布局或视觉方向
 - 可豁免：文案 / 色值微调、已知组件内单字段（在 `prototype.md` 写清理由）
-- **门面级新页 / 整页重做首轮**：≥2 结构性变体 + 送闸前 **fresh-session Critic 评审**（逐变体按质量锚打分 + 排序 + 最大风险，写 `prototype.md`「评审」节；见引擎「Agent 角色约定」）
+- 门面级新页 / 整页重做首轮：≥2 结构性变体（Critic 评审已按 ADR-006 移除）
 
 ### 预览链接（项目填写）
 

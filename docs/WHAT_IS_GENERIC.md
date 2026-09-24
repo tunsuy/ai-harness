@@ -16,12 +16,13 @@
 | 产品流水线（定义/验收） | `docs/PRODUCT_PIPELINE.md` + scaffold `define-feature` / `accept-feature` + `docs/features/_TEMPLATE/` |
 | 产品机械门禁 | scaffold `kb_sync.py`：`check`（Brief/ADR 抢跑、handoff.task）/ `check-ship`（Accept PASS）；零依赖 YAML fallback |
 | 合入闸 | `pr-merge.sh` + hooks 禁裸 `gh pr merge`；合入后 handoff 复位 idle |
-| UI 原型模板 | `_TEMPLATE/prototype.md`（含两段式 Critic 评审节 + 送闸前自查清单 + Concept 方向来源行）+ `_accept-checklist.md` 骨架 |
+| UI 原型模板 | `_TEMPLATE/prototype.md`（送闸前自查清单 + Concept 方向来源行；~~两段式 Critic 评审节~~ ADR-006 已移除）+ `_accept-checklist.md` 骨架 |
 | Concept Sketch（可选概念工具） | 引擎 `PRODUCT_PIPELINE.md` 一节：Stitch 等无约束出方向，产出隔离在项目 `docs/features/<id>/concept/`，人闸选产品形态；原型闸内 token 重做；含官方 skill 准入映射（✅ 生成类 / ⚠️ 设计系统仅 Build 期辅助 / ❌ 反向 DESIGN.md 与 screen→code 类） |
 | 设计参照库 | `docs/design/references/`（取法 + stripe/vercel/posthog 样例 + `cn-design-systems/` 中文三家 token 级对照）；项目 `DESIGN.md` 骨架 |
 | Layer-1 设计门禁 | scaffold `scripts/design-lint.js`（token 表自动解析自项目 DESIGN.md front matter，零依赖）+ `make design-lint`；含 `lint.baseline` 已知漂移基线机制（折回后必须删条目）；**语义层规则 opt-in**（`lint.semantic-paths` 圈定页面树才扫：行内不加粗 SEMANTIC-BOLD / 表格口径 caption SEMANTIC-CAPTION；`semantic-exempt` 存量漂移豁免）；三层门禁架构见 `PRODUCT_PIPELINE.md` |
 | 验证分层方法论 | **ADR-005**：预览（L0 dev server/HMR）/ PR（L1 静态+单测）/ main（L2 全量 smoke 兜底）三层，「预览快、门禁严，两层不混」；行为冒烟只挂 main push（合入点即发布点），本地 Accept 准出不缩水，main 挂了走立即修复；pr-merge 超时 ≥ 最慢 PR job（默认 1800s）；管线骨架见 scaffold `product-pipeline.md`「验证分层」节 |
-| 质量锚方法论 | scaffold `DESIGN.md` 骨架「质量锚」默认八条 + 两段式（观感先于核对）说明；锚条目项目可增删改 |
+| 质量锚方法论 | scaffold `DESIGN.md` 骨架「质量锚」默认八条（~~两段式自评说明~~ ADR-006 已移除，锚作 Accept/人审对照保留）；锚条目项目可增删改 |
+| 闸内工序减配 | **ADR-006**：原型闸去两段式自评/Critic（工序 = 组件覆盖检查 → design-lint → 人闸；分级表删两列）；Build 期免配套浏览器 E2E（行为验证归 ADR-005 分层）；工作流不产截图（预览链接即人闸材料，Accept 取证 = 命令/API/单测/亲测） |
 | 可配置禁写 | `docs/harness/policy.yaml` |
 | Make 目标 | `Makefile.harness.mk`（含 `check-ship` / `pr-merge`） |
 | stale handoff | `handoff.sh` + session-start：main 上 `status: active` 警告 |
